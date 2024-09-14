@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "great-reads"
+version = "0.1.0"
+description = ""
+authors = ["rezmotaqi <rezmotaqi@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.114.2"
+pydantic-settings = "^2.5.2"
+motor = "^3.5.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
