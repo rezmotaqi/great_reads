@@ -10,6 +10,6 @@ app = FastAPI(
     version=settings.VERSION
 )
 
-app.include_router(router=router, prefix=f"{settings.API_ROUTE_PREFIX}{settings.VERSION_ROUTE_PREFIX}")
+app.include_router(router=router, prefix=f"{settings.API_ROUTE_PREFIX}")
 
 

@@ -15,7 +15,6 @@ class Settings(BaseSettings):
 
     VERSION: str = '1.0.0'
     API_ROUTE_PREFIX: str = '/api'
-    VERSION_ROUTE_PREFIX: str = '/v1'
 
 
 settings = Settings()
