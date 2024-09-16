@@ -1,4 +1,3 @@
-from datetime import datetime
 
 from bson import ObjectId
 from pydantic import BaseModel
@@ -21,7 +20,9 @@ class PydanticObjectId(ObjectId):
 
 class Model(BaseModel):
     class Config:
+        datetime_format = "%Y-%m-%d %H:%M:%S"
         json_encoders = {
-            ObjectId: str,
-            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S")
+            PydanticObjectId: lambda v: str(v)  # You can define how to encode PydanticObjectId
+            # datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S")
+
         }

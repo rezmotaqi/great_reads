@@ -1,11 +1,9 @@
 from datetime import datetime
-from bson import ObjectId
-from pydantic import BaseModel
 
-from app.core.types import PydanticObjectId
+from app.core.types import PydanticObjectId, Model
 
 
-class BookCreateInput(BaseModel):
+class BookCreateInput(Model):
     name: str
     author: str
     publish_year: datetime
@@ -14,7 +12,7 @@ class BookCreateInput(BaseModel):
     sub_category: str
 
 
-class BookCreateOutput(BaseModel):
+class BookCreateOutput(Model):
     id: PydanticObjectId
     name: str
     author: str

@@ -12,5 +12,5 @@ router = APIRouter()
 
 @router.post("", response_model=BookCreateOutput)
 async def create_book(book: BookCreateInput, db: AsyncIOMotorDatabase = Depends(get_db)):
-    book = await Book(book_data=book, db=db).save()
+    book = await Book(db=db).save(data=book)
     return book

@@ -11,6 +11,6 @@ class Book:
     db: AsyncIOMotorDatabase
 
     async def save(self, data: BookCreateInput) -> BookCreateOutput:
-        model = await BookModel.model_validate(data.model_dump())
+        model = BookModel.model_validate(data.model_dump())
         result = await self.db.books.insert_one(model.model_dump())
         return BookCreateOutput(**model.model_dump(), id=result.inserted_id)
