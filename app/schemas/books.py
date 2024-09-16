@@ -1,10 +1,25 @@
-from pydantic import BaseModel, Field
+from datetime import datetime
+from bson import ObjectId
+from pydantic import BaseModel
+
+from app.core.types import PydanticObjectId
 
 
-class BookPostInput(BaseModel):
+class BookCreateInput(BaseModel):
     name: str
     author: str
-    publish_year: int
+    publish_year: datetime
     number_of_pages: int
     category: str
     sub_category: str
+
+
+class BookCreateOutput(BaseModel):
+    id: PydanticObjectId
+    name: str
+    author: str
+    publish_year: datetime
+    number_of_pages: int
+    category: str
+    sub_category: str
+
