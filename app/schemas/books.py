@@ -1,6 +1,11 @@
 from datetime import datetime
+from enum import Enum
 
 from app.core.types import PydanticObjectId, Model
+
+
+class Category(str, Enum):
+    Novel = 'novel'
 
 
 class BookCreateInput(Model):
@@ -8,8 +13,8 @@ class BookCreateInput(Model):
     author: str
     publish_year: datetime
     number_of_pages: int
-    category: str
-    sub_category: str
+    category: Category
+    # sub_category:
 
 
 class BookCreateOutput(Model):
@@ -20,4 +25,3 @@ class BookCreateOutput(Model):
     number_of_pages: int
     category: str
     sub_category: str
-
