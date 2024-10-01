@@ -6,7 +6,6 @@ from app.models.books import BookModel
 from app.schemas.books import BookCreateInput, BookCreateOutput
 
 
-@dataclass
 class Book:
     db: AsyncIOMotorDatabase
 

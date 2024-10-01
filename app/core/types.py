@@ -33,17 +33,6 @@ class PydanticObjectId(str):
         return ObjectId(value)
 
 
-# Example Pydantic model with ObjectId field
-class UserModel(BaseModel):
-    id: PydanticObjectId
-    name: str
-
-    class Config:
-        json_encoders = {
-            ObjectId: str
-        }
-
-
 class Model(BaseModel):
     class Config:
         # datetime_format = "%Y-%m-%d %H:%M:%S"

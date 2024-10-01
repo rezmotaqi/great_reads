@@ -8,4 +8,7 @@ from fastapi import APIRouter, Depends
 router = APIRouter()
 
 
-@router.post("/", response_model=)
+@router.post("/")
+async def signup():
+
+    ...
