@@ -15,8 +15,11 @@ class Settings(BaseSettings):
     MONGO_PASSWORD: Optional[str] = None
     MONGO_USER: Optional[str] = None
 
+    REDIS_URL = "redis://localhost:6379"
+
     VERSION: str = '1.0.0'
     API_ROUTE_PREFIX: str = '/api'
+    SECRET_KEY: str = "123"
 
 
 settings = Settings()
