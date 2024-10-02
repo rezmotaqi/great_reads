@@ -1,3 +1,4 @@
+import aioredis
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.config.settings import settings
@@ -26,3 +27,7 @@ class MongoHandler:
 def get_db():
     """A function that returns database object."""
     return MongoHandler.get_database()
+
+
+class RedisHandler:
+    redis_client = aioredis.from_url(REDIS_URL)

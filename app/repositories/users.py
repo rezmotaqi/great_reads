@@ -1,3 +1,4 @@
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.models.users import User
 from app.schemas.users import UserRegistrationInput
@@ -13,3 +14,6 @@ class UserRepository:
 
     async def get_user_by_email(self, email: str):
         return await self.db.users.find_one({"username": email})
+
+    async def get_user_by_id(self, user_id: ObjectId) -> User:
+        return await self.db.users.find_one({"_id": user_id})

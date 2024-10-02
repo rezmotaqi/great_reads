@@ -1,12 +1,13 @@
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jwt import jwt
+from starlette import status
 
 from app.config.settings import settings
 from app.models.users import User
 from app.repositories.users import UserRepository
-from app.schemas.users import UserRegistrationInput
-from utils import hash_password, generate_jwt_token
+from app.schemas.users import UserRegistrationInput, LoginInput
+from utils import hash_password, generate_jwt_token, check_password
 
 
 class AuthService:
@@ -27,7 +28,7 @@ class AuthService:
 
         await self.user_repository.create_user(user_registration_input, hashed_password=hashed_password)
 
-    async def login_user(self, user_data: UserLogin):
+    async def login_user(self, user_data: LoginInput):
         user = await self.user_repository.get_user_by_email(user_data.email)
         if not user or not check_password(user_data.password, user.password):
             raise HTTPException(status_code=401, detail="Unauthorized")
@@ -40,13 +41,14 @@ class AuthService:
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # For demonstration purposes
 
 
-# Function to get the current user from the JWT
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
 
         # Check if the JTI is blacklisted in Redis
+
         if redis_client.sismember("jti_blacklist", payload["jti"]):
+
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token is revoked",
@@ -54,7 +56,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             )
 
         # You can fetch user details from a database here based on payload["sub"]
-        user = get_user_from_db(payload["sub"])  # Replace with your database logic
+        user = UserRepository(db=db).get_user_by_id(user_id=payload["sub"])
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

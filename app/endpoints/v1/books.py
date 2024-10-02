@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.handlers.mongo import get_db
+from app.handlers.databases import get_db
 from app.repositories.books import Book
 from app.schemas.books import BookCreateInput, BookCreateOutput
 

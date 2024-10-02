@@ -1,7 +1,7 @@
 from typing import Optional
 
 from password_strength import PasswordPolicy
-from pydantic import EmailStr, Field, field_validator
+from pydantic import EmailStr, Field, field_validator, SecretStr
 
 from app.core.types import Model
 
@@ -31,3 +31,8 @@ class UserRegistrationInput(Model):
         if not result:
             raise ValueError(f"Password does not meet requirements: {result}")
         return value
+
+
+class LoginInput(Model):
+    username: EmailStr
+    password: str
