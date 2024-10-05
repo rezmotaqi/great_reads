@@ -1,9 +1,9 @@
 from typing import Optional
 
 from password_strength import PasswordPolicy
-from pydantic import EmailStr, Field, field_validator, SecretStr
+from pydantic import EmailStr, Field, field_validator
 
-from app.core.types import Model
+from app.core.types import Model, PydanticObjectId
 
 
 class UserProfile(Model):
@@ -13,7 +13,7 @@ class UserProfile(Model):
 
 
 class UserRegistrationInput(Model):
-    UserProfile: UserProfile = Field(...)
+    user_profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
     password: str = Field(...)
     repeat_password: str = Field(...)
@@ -36,3 +36,13 @@ class UserRegistrationInput(Model):
 class LoginInput(Model):
     username: EmailStr
     password: str
+
+
+class JwtExtractedUser(Model):
+    """Schema for user that which was set in jwt payload"""
+    user_id: PydanticObjectId = Field(description="User id")
+    permissions: list = Field(...)
+
+
+class CurrentUserOutput(Model):
+    user_id: PydanticObjectId = Field(description="User id", alias="_id")

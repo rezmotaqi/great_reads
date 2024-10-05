@@ -6,3 +6,9 @@ and communicating with other readers.
 
 list of apis:
     1. user sign up
+
+
+
+run:
+1. pip install pycrypto
+2. pip install jose

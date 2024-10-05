@@ -1,10 +1,11 @@
-import aioredis
+import redis.asyncio as redis
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.config.settings import settings
+from app.core.utils import SingletonMeta
 
 
-class MongoHandler:
+class MongoHandler(metaclass=SingletonMeta):
     _client: AsyncIOMotorClient = None
 
     @classmethod
@@ -24,10 +25,11 @@ class MongoHandler:
         return client[settings.MONGO_DB]
 
 
-def get_db():
+def get_mongo_db():
     """A function that returns database object."""
     return MongoHandler.get_database()
 
 
-class RedisHandler:
-    redis_client = aioredis.from_url(REDIS_URL)
+class RedisHandler(metaclass=SingletonMeta):
+    redis_client = redis.from_url(settings.REDIS_URL)
+

@@ -1,4 +1,4 @@
-from pydantic import Field, validator, field_validator
+from pydantic import field_validator
 
 from app.core.types import Model
 

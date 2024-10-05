@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from app.core.types import PydanticObjectId, Model
+from app.core.types import Model
 
 
 class Category(str, Enum):
@@ -18,8 +18,7 @@ class BookCreateInput(Model):
 
 
 class BookCreateOutput(Model):
-    id: PydanticObjectId
-    name: str
+    book_id: str
     author: str
     publish_year: datetime
     number_of_pages: int

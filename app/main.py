@@ -1,6 +1,8 @@
 
 
 from fastapi import FastAPI
+
+from app.core.middlewares import auth_middleware
 from app.core.routers import router
 from app.config.settings import settings
 
@@ -13,3 +15,4 @@ app = FastAPI(
 app.include_router(router=router, prefix=f"{settings.API_ROUTE_PREFIX}")
 
 
+app.middleware("http")(auth_middleware)

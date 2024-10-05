@@ -1,9 +1,8 @@
 from typing import Any
 
 from bson import ObjectId
-from pydantic import BaseModel, GetCoreSchemaHandler, GetJsonSchemaHandler
-from pydantic.json_schema import JsonSchemaValue
-from pydantic_core import CoreSchema, core_schema
+from pydantic import BaseModel
+from pydantic_core import core_schema
 
 
 class PydanticObjectId(str):

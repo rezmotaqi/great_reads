@@ -1,0 +1,15 @@
+{
+  "public_endpoints": ["/docs"],
+  "all_permissions": ["read_users", "create_users", "read_products", "update_products", "delete_products"],
+  "endpoints": {
+    "/users": {
+      "GET": ["read_users"],
+      "POST": ["create_users"]
+    },
+    "/products/{product_id}": {
+      "GET": ["read_products"],
+      "PUT": ["update_products"],
+      "DELETE": ["delete_products"]
+    }
+  }
+}
