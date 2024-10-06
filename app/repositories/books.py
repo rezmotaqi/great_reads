@@ -12,4 +12,6 @@ class Book:
     async def save(self, data: BookCreateInput) -> BookCreateOutput:
         model = BookModel.model_validate(data.model_dump())
         result = await self.db.books.insert_one(model.model_dump())
-        return BookCreateOutput(**model.model_dump(), book_id=result.inserted_id)
+        return BookCreateOutput(
+            **model.model_dump(), book_id=result.inserted_id
+        )

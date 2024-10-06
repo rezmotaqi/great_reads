@@ -5,7 +5,7 @@ from app.core.types import Model
 
 
 class Category(str, Enum):
-    Novel = 'novel'
+    Novel = "novel"
 
 
 class BookCreateInput(Model):

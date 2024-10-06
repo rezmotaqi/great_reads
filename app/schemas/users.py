@@ -18,7 +18,7 @@ class UserRegistrationInput(Model):
     password: str = Field(...)
     repeat_password: str = Field(...)
 
-    @field_validator('password')
+    @field_validator("password")
     def validate_password_strength(cls, value):
         policy = PasswordPolicy()
         policy.minimum_length = 8
@@ -40,6 +40,7 @@ class LoginInput(Model):
 
 class JwtExtractedUser(Model):
     """Schema for user that which was set in jwt payload"""
+
     user_id: PydanticObjectId = Field(description="User id")
     permissions: list = Field(...)
 

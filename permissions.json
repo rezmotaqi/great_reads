@@ -1,5 +1,5 @@
 {
-  "public_endpoints": ["/docs"],
+  "public_endpoints": ["/docs", "/openapi.json", "/favicon.ico", "/", "/  login"],
   "all_permissions": ["read_users", "create_users", "read_products", "update_products", "delete_products"],
   "endpoints": {
     "/users": {

@@ -15,4 +15,4 @@ class User(BaseModel):
     password: str
 
     class Config:
-        extra = 'ignore'
+        extra = "ignore"

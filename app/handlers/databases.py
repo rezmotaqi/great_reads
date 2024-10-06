@@ -32,4 +32,3 @@ def get_mongo_db():
 
 class RedisHandler(metaclass=SingletonMeta):
     redis_client = redis.from_url(settings.REDIS_URL)
-

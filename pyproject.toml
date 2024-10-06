@@ -19,6 +19,9 @@ aioredis = "^2.0.1"
 password-strength = "^0.0.3.post2"
 pydantic = {extras = ["email"], version = "^2.9.2"}
 python-jose = "^3.3.0"
+flake8 = "^7.1.1"
+black = "^24.8.0"
+isort = "^5.13.2"
 
 
 [build-system]
