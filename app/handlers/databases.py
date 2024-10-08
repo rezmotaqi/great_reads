@@ -1,7 +1,7 @@
 import redis.asyncio as redis
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from app.config.settings import settings
+from app.core.settings import settings
 from app.core.utils import SingletonMeta
 
 
@@ -20,16 +20,14 @@ class MongoHandler(metaclass=SingletonMeta):
         return cls._client
 
     @classmethod
-    def get_database(cls):
+    def get_database(cls) -> AsyncIOMotorDatabase:
         client = cls.get_client()
         return client[settings.MONGO_DB]
 
 
-def get_mongo_db() -> str:
+def get_mongo_db() -> AsyncIOMotorDatabase:
     """A function that returns database object."""
-    return "moooz"
-    # x = MongoHandler.get_database()
-    # return x
+    return MongoHandler.get_database()
 
 
 class RedisHandler(metaclass=SingletonMeta):

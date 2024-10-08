@@ -4,17 +4,15 @@ from fastapi import APIRouter, Depends, status
 
 from app.core.authentication import (
     AuthService,
-    get_current_user_from_database,
     get_authentication_service,
+    get_current_user_from_database,
 )
 from app.schemas.users import LoginInput, UserRegistrationInput
 
 router = APIRouter()
 
 
-@router.post(
-    "/register", status_code=status.HTTP_201_CREATED, response_model=None
-)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(
     user: UserRegistrationInput,
     auth_service: AuthService = Depends(get_authentication_service),

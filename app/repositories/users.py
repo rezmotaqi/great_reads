@@ -1,6 +1,8 @@
 from bson import ObjectId
+from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.handlers.databases import get_mongo_db
 from app.models.users import User
 from app.schemas.users import UserRegistrationInput
 
@@ -31,5 +33,7 @@ class UserRepository:
         return await self.db.users.find_one({"_id": user_id})
 
 
-def get_user_repository() -> UserRepository:
-    return UserRepository()
+def get_user_repository(
+    db: AsyncIOMotorDatabase = Depends(get_mongo_db),
+) -> UserRepository:
+    return UserRepository(db=db)

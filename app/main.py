@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.config.settings import settings
+from app.core.settings import settings
 from app.core.middlewares import auth_middleware
 from app.core.routers import router
 

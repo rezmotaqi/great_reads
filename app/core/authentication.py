@@ -7,13 +7,11 @@ from bson import ObjectId
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt  # Import exceptions
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from passlib.context import CryptContext
 from starlette import status
 
-from app.config.settings import settings
+from app.core.settings import settings
 from app.core.utils import SingletonMeta
-from app.handlers.databases import get_mongo_db
 from app.models.users import User
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.users import (
