@@ -29,8 +29,7 @@ async def read_users_me(
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login(
-    user: Any = Depends(),
-    # auth_service: AuthService = Depends(get_authentication_service),
+    user: Any = Depends(get_current_user_from_database),
+    auth_service: AuthService = Depends(get_authentication_service),
 ):
-    ...
-    # await auth_service.login_user(user)
+    await auth_service.login_user(user)
