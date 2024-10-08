@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Response
 from starlette.requests import Request
 
 from app.core.authentication import (
@@ -22,20 +22,23 @@ async def auth_middleware(request: Request, call_next):
     including permissions.
     3. Retrieves the required permissions for the requested endpoint from
     the PermissionManager.
-    4. Checks if the user has the necessary permissions to access the
+    4. Checks if the user has the nece  ssary permissions to access the
     endpoint. If not, raises an HTTPException with
     a 403 Forbidden status code.
 
     Args: request (Request): The incoming request. call_next (Callable): The
     next middleware or route handler in the chain.
     """
+    print(f"Called endpoint {request.url.path}")
     if request.url.path in await permission_manager.get_public_endpoints():
         return await call_next(request)
     if request.headers.get("Authorization") is None:
-        raise HTTPException(
+        return Response(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid authorization header",
+            content="Invalid authorization header",
+            media_type="application/json",
         )
+
     user: JwtExtractedUser = await get_user_jwt_payload_data_from_token(
         request.headers.get("Authorization")
     )

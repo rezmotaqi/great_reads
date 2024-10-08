@@ -1,15 +1,38 @@
 {
-  "public_endpoints": ["/docs", "/openapi.json", "/favicon.ico", "/", "/  login"],
-  "all_permissions": ["read_users", "create_users", "read_products", "update_products", "delete_products"],
+  "public_endpoints": [
+    "/docs",
+    "/openapi.json",
+    "/favicon.ico",
+    "/",
+    "/api/authentication/login",
+    "/api/authentication/register"
+  ],
+  "all_permissions": [
+    "read_users",
+    "create_users",
+    "read_books",
+    "update_books",
+    "delete_books"
+  ],
   "endpoints": {
     "/users": {
-      "GET": ["read_users"],
-      "POST": ["create_users"]
+      "GET": [
+        "read_users"
+      ],
+      "POST": [
+        "create_users"
+      ]
     },
-    "/products/{product_id}": {
-      "GET": ["read_products"],
-      "PUT": ["update_products"],
-      "DELETE": ["delete_products"]
+    "/books/{book_id}": {
+      "GET": [
+        "read_books"
+      ],
+      "PUT": [
+        "update_books"
+      ],
+      "DELETE": [
+        "delete_books"
+      ]
     }
   }
 }

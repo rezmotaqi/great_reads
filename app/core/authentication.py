@@ -8,13 +8,14 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt  # Import exceptions
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from passlib.context import CryptContext
 from starlette import status
 
 from app.config.settings import settings
 from app.core.utils import SingletonMeta
 from app.handlers.databases import get_mongo_db
 from app.models.users import User
-from app.repositories.users import UserRepository
+from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.users import (
     JwtExtractedUser,
     LoginInput,
@@ -37,9 +38,12 @@ def hash_password(password: str) -> str:
     return hashed_password.decode("utf-8")
 
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
 class AuthService:
     def __init__(self, user_repository: UserRepository):
-        self.user_repository = user_repository
+        self.user_repository: UserRepository = user_repository
 
     async def register_user(
         self, user_registration_input: UserRegistrationInput
@@ -53,7 +57,7 @@ class AuthService:
         # user_data.email) if existing_user: raise HTTPException(
         # status_code=400, detail="User already exists")
 
-        hashed_password = hash_password(user_registration_input.password)
+        hashed_password = pwd_context.hash(user_registration_input.password)
 
         await self.user_repository.create_user(
             user_registration_input, hashed_password=hashed_password
@@ -66,6 +70,12 @@ class AuthService:
 
         access_token = generate_jwt_token(user.id)
         return access_token
+
+
+async def get_authentication_service() -> AuthService:
+    user_repository: UserRepository = Depends(get_user_repository)
+
+    return AuthService(user_repository=user_repository)
 
 
 async def get_current_user_from_database(

@@ -22,7 +22,10 @@ class MongoHandler(metaclass=SingletonMeta):
     @classmethod
     def get_database(cls):
         client = cls.get_client()
-        return client[settings.MONGO_DB]
+        try:
+            yield client[settings.MONGO_DB]
+        finally:
+            client.close()
 
 
 def get_mongo_db():
