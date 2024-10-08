@@ -7,11 +7,13 @@ from bson import ObjectId
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt  # Import exceptions
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from passlib.context import CryptContext
 from starlette import status
 
 from app.core.settings import settings
 from app.core.utils import SingletonMeta
+from app.handlers.databases import get_mongo_db
 from app.models.users import User
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.users import (
@@ -77,6 +79,7 @@ async def get_authentication_service(
 
 async def get_current_user_from_database(
     token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")),
+    db: AsyncIOMotorDatabase = Depends(get_mongo_db),
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -90,7 +93,7 @@ async def get_current_user_from_database(
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
-        user: User = await UserRepository().get_user_by_id(
+        user: User = await UserRepository(db=db).get_user_by_id(
             user_id=ObjectId(user_id)
         )
         if not user:
