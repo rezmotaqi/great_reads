@@ -22,15 +22,14 @@ class MongoHandler(metaclass=SingletonMeta):
     @classmethod
     def get_database(cls):
         client = cls.get_client()
-        try:
-            yield client[settings.MONGO_DB]
-        finally:
-            client.close()
+        return client[settings.MONGO_DB]
 
 
-def get_mongo_db():
+def get_mongo_db() -> str:
     """A function that returns database object."""
-    return MongoHandler.get_database()
+    return "moooz"
+    # x = MongoHandler.get_database()
+    # return x
 
 
 class RedisHandler(metaclass=SingletonMeta):

@@ -29,7 +29,6 @@ async def auth_middleware(request: Request, call_next):
     Args: request (Request): The incoming request. call_next (Callable): The
     next middleware or route handler in the chain.
     """
-    print(f"Called endpoint {request.url.path}")
     if request.url.path in await permission_manager.get_public_endpoints():
         return await call_next(request)
     if request.headers.get("Authorization") is None:

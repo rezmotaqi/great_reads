@@ -1,14 +1,12 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.core.authentication import (
     AuthService,
     get_current_user_from_database,
     get_authentication_service,
 )
-from app.handlers.databases import get_mongo_db
 from app.schemas.users import LoginInput, UserRegistrationInput
 
 router = APIRouter()
@@ -21,7 +19,6 @@ async def register(
     user: UserRegistrationInput,
     auth_service: AuthService = Depends(get_authentication_service),
 ):
-    ...
     await auth_service.register_user(user)
 
 

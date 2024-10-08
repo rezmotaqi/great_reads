@@ -58,7 +58,6 @@ class AuthService:
         # status_code=400, detail="User already exists")
 
         hashed_password = pwd_context.hash(user_registration_input.password)
-
         await self.user_repository.create_user(
             user_registration_input, hashed_password=hashed_password
         )
@@ -72,15 +71,14 @@ class AuthService:
         return access_token
 
 
-async def get_authentication_service() -> AuthService:
-    user_repository: UserRepository = Depends(get_user_repository)
-
+async def get_authentication_service(
+    user_repository: UserRepository = Depends(get_user_repository),
+) -> AuthService:
     return AuthService(user_repository=user_repository)
 
 
 async def get_current_user_from_database(
     token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")),
-    db: AsyncIOMotorDatabase = Depends(get_mongo_db),
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -94,7 +92,7 @@ async def get_current_user_from_database(
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
-        user: User = await UserRepository(db=db).get_user_by_id(
+        user: User = await UserRepository().get_user_by_id(
             user_id=ObjectId(user_id)
         )
         if not user:
@@ -111,9 +109,7 @@ async def get_current_user_from_database(
 
 
 def check_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(
-        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
-    )
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def generate_jwt_token(user_id: int) -> str:
@@ -122,7 +118,7 @@ def generate_jwt_token(user_id: int) -> str:
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     jwt_payload = {
-        "sub": str(user_id),  # Ensure user_id is a string
+        "sub": str(user_id),
         "exp": token_expire,
         "iat": now,
         "jti": str(uuid.uuid4()),
