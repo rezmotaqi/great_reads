@@ -29,8 +29,15 @@ class UserRegistrationInput(Model):
     #
     #     result = policy.test(value)
     #     if not result:
-    #         raise ValueError(f"Password does not meet requirements: {result}")
+    #         raise ValueError(
+    #         f"Password does not meet requirements: {result}"
+    #         )
     #     return value
+
+
+class UserRegistrationOutput(Model):
+    profile: UserProfile = Field(...)
+    username: EmailStr = Field(...)
 
 
 class LoginInput(Model):

@@ -16,11 +16,7 @@ from app.core.utils import SingletonMeta
 from app.handlers.databases import get_mongo_db
 from app.models.users import User
 from app.repositories.users import UserRepository, get_user_repository
-from app.schemas.users import (
-    JwtExtractedUser,
-    LoginInput,
-    UserRegistrationInput,
-)
+from app.schemas.users import LoginInput, UserRegistrationInput
 
 
 def hash_password(password: str) -> str:
@@ -67,7 +63,7 @@ class AuthService:
         if not user or not check_password(user_data.password, user.password):
             raise HTTPException(status_code=401, detail="Unauthorized")
 
-        access_token = generate_jwt_token(user.id)
+        access_token = Jwt.generate(user.id)
         return access_token
 
 
@@ -77,85 +73,85 @@ async def get_authentication_service(
     return AuthService(user_repository=user_repository)
 
 
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+
 async def get_current_user_from_database(
         token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")),
         db: AsyncIOMotorDatabase = Depends(get_mongo_db),
 ) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+
+    payload = jwt.decode(
+        token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
     )
-    try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-        user: User = await UserRepository(db=db).get_user_by_id(
-            user_id=ObjectId(user_id)
-        )
-        if not user:
-            raise credentials_exception
-        return user
-    except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except JWTError:  # Catch any jose JWT errors
+    user_id: str = payload.get("sub")
+    if user_id is None:
         raise credentials_exception
+    user: User = await UserRepository(db=db).get_user_by_id(
+        user_id=ObjectId(user_id)
+    )
+    if not user:
+        raise credentials_exception
+    return user
 
 
 def check_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def generate_jwt_token(user_id: int) -> str:
-    now = datetime.utcnow()
-    token_expire = now + timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    )
-    jwt_payload = {
-        "sub": str(user_id),
-        "exp": token_expire,
-        "iat": now,
-        "jti": str(uuid.uuid4()),
-    }
-    access_token = jwt.encode(
-        jwt_payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-    )
-    return access_token
+class Jwt:
 
-
-async def get_user_jwt_payload_data_from_token(token: str) -> JwtExtractedUser:
-    try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=settings.ALGORITHM
-        )
-        user_id = payload.get("sub")
-        if user_id is None:
+    @staticmethod
+    def decode(token: str):
+        try:
+            payload = jwt.decode(
+                token, settings.SECRET_KEY, algorithms=settings.ALGORITHM
+            )
+            return payload
+            # user_id = payload.get("sub")
+            # if user_id is None:
+            #     raise HTTPException(
+            #         status_code=status.HTTP_401_UNAUTHORIZED,
+            #         detail="Invalid authentication credentials",
+            #     )
+            #
+            # return JwtExtractedUser(
+            #     user_id=int(user_id),
+            #     permissions=payload.get("permissions", []),
+            # )
+        except ExpiredSignatureError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication credentials",
+                detail="Token has expired",
+                headers={"WWW-Authenticate": "Bearer"},
             )
-        return JwtExtractedUser(
-            user_id=int(user_id), permissions=payload.get("permissions", [])
+        except JWTError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    @staticmethod
+    def generate(user_id: ObjectId) -> str:
+        now = datetime.utcnow()
+        token_expire = now + timedelta(
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
-    except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
+        jwt_payload = {
+            "sub": str(user_id),
+            "exp": token_expire,
+            "iat": now,
+            "jti": str(uuid.uuid4()),
+        }
+        access_token = jwt.encode(
+            jwt_payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM
         )
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        return access_token
 
 
 class PermissionManager(metaclass=SingletonMeta):

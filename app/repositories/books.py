@@ -1,4 +1,5 @@
 from fastapi import Depends
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.handlers.databases import get_mongo_db
 from app.models.books import BookModel
@@ -6,7 +7,9 @@ from app.schemas.books import BookCreateInput, BookCreateOutput
 
 
 class Book:
-    def __init__(self, db: Depends(get_mongo_db)) -> None:
+    def __init__(
+        self, db: AsyncIOMotorDatabase = Depends(get_mongo_db)
+    ) -> None:
         self.db = db
 
     async def save(self, data: BookCreateInput) -> BookCreateOutput:
