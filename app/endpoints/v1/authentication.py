@@ -1,13 +1,18 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 
 from app.core.authentication import (
     AuthService,
     get_authentication_service,
     get_current_user_from_database,
 )
-from app.schemas.users import LoginInput, UserRegistrationInput
+from app.schemas.users import (
+    LoginInput,
+    UserRegistrationInput,
+    UserRegistrationOutput,
+)
 
 router = APIRouter()
 
@@ -18,6 +23,10 @@ async def register(
     auth_service: AuthService = Depends(get_authentication_service),
 ):
     await auth_service.register_user(user)
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content=UserRegistrationOutput,
+    )
 
 
 @router.get("/me")

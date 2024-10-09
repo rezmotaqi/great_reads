@@ -11,9 +11,7 @@ router = APIRouter()
 # @router.get("/", response_model=List[Book])
 
 
-@router.post("", response_model=BookCreateOutput)
-async def create_book(
-    book: BookCreateInput, db: AsyncIOMotorDatabase = Depends(get_mongo_db)
-):
-    book = await Book(db=db).save(data=book)
+@router.post("/", response_model=BookCreateOutput)
+async def create_book():
+    book = await Book().save(data=BookCreateInput)
     return book

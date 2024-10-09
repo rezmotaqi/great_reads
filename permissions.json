@@ -15,23 +15,12 @@
     "delete_books"
   ],
   "endpoints": {
-    "/users": {
+    "/book": {
       "GET": [
         "read_users"
       ],
       "POST": [
         "create_users"
-      ]
-    },
-    "/books/{book_id}": {
-      "GET": [
-        "read_books"
-      ],
-      "PUT": [
-        "update_books"
-      ],
-      "DELETE": [
-        "delete_books"
       ]
     }
   }

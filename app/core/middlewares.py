@@ -3,7 +3,6 @@ from starlette.requests import Request
 
 from app.core.authentication import (
     get_permission_manager,
-    get_user_jwt_payload_data_from_token,
 )
 from app.schemas.users import JwtExtractedUser
 
@@ -31,6 +30,7 @@ async def auth_middleware(request: Request, call_next):
     """
     if request.url.path in await permission_manager.get_public_endpoints():
         return await call_next(request)
+
     if request.headers.get("Authorization") is None:
         return Response(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -38,9 +38,14 @@ async def auth_middleware(request: Request, call_next):
             media_type="application/json",
         )
 
-    user: JwtExtractedUser = await get_user_jwt_payload_data_from_token(
+    user: JwtExtractedUser = await Jwt.decode_jwt(
         request.headers.get("Authorization")
     )
+
+    # check if has jwt
+    # check if jwt is valid
+    # get data from jwt
+
     required_permissions = permission_manager.get_endpoint_permissions(
         request.url.path, request.method
     )
