@@ -46,7 +46,7 @@ class AuthService:
         self.user_repository: UserRepository = user_repository
 
     async def register_user(
-        self, user_registration_input: UserRegistrationInput
+            self, user_registration_input: UserRegistrationInput
     ) -> None:
         # if not validate_email(user_data.email):
         #     raise HTTPException(status_code=400, detail="Invalid email")
@@ -72,14 +72,14 @@ class AuthService:
 
 
 async def get_authentication_service(
-    user_repository: UserRepository = Depends(get_user_repository),
+        user_repository: UserRepository = Depends(get_user_repository),
 ) -> AuthService:
     return AuthService(user_repository=user_repository)
 
 
 async def get_current_user_from_database(
-    token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")),
-    db: AsyncIOMotorDatabase = Depends(get_mongo_db),
+        token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")),
+        db: AsyncIOMotorDatabase = Depends(get_mongo_db),
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -235,3 +235,27 @@ class PermissionManager(metaclass=SingletonMeta):
 
 def get_permission_manager():
     return PermissionManager()
+
+
+class Role:
+    def __init__(self, permissions=None):
+        self.permissions = permissions or []
+
+    def has_permission(self, permission):
+        return permission in self.permissions
+
+
+class AdminRole(Role):
+    def __init__(self):
+        super().__init__(permissions=["read_users", "create_users", "update_books", "delete_books"])
+
+
+class ReaderRole(Role):
+    def __init__(self):
+        super().__init__(permissions=["read_books"])
+
+
+# Usage
+user_role = AdminRole()
+if user_role.has_permission("create_users"):
+    print("User has permission to create users.")

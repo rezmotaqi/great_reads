@@ -8,16 +8,16 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", env_ignore_empty=True
     )
 
-    PROJECT_NAME: str
+    PROJECT_NAME: str = "Great reads"
     PROJECT_DESCRIPTION: Optional[str] = (
         "A site for managing the process of reading books."
     )
 
     ALGORITHM: str = "HS256"
 
-    MONGO_HOST: str
-    MONGO_PORT: int
-    MONGO_DB: str
+    MONGO_HOST: str = "mongodb://localhost"
+    MONGO_PORT: int = 27017
+    MONGO_DB: str = "great_reads"
     MONGO_PASSWORD: Optional[str] = None
     MONGO_USER: Optional[str] = None
 
