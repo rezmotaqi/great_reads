@@ -16,10 +16,7 @@ from app.core.utils import SingletonMeta
 from app.handlers.databases import get_mongo_db
 from app.models.users import User
 from app.repositories.users import UserRepository, get_user_repository
-from app.schemas.users import (
-    LoginInput,
-    UserRegistrationInput,
-)
+from app.schemas.users import LoginInput, UserRegistrationInput
 
 
 def hash_password(password: str) -> str:

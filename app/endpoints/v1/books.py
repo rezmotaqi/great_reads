@@ -1,7 +1,5 @@
-from fastapi import APIRouter, Depends
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from fastapi import APIRouter
 
-from app.handlers.databases import get_mongo_db
 from app.repositories.books import Book
 from app.schemas.books import BookCreateInput, BookCreateOutput
 
@@ -12,6 +10,6 @@ router = APIRouter()
 
 
 @router.post("/", response_model=BookCreateOutput)
-async def create_book():
-    book = await Book().save(data=BookCreateInput)
+async def create_book(data: BookCreateInput):
+    book = await Book().save(data=data)
     return book
