@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from app.core.settings import settings
 from app.core.middlewares import auth_middleware
 from app.core.routers import router
+from app.core.settings import settings
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

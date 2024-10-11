@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import EmailStr, Field
@@ -12,7 +13,6 @@ class UserProfile(Model):
 
 
 class UserRegistrationInput(Model):
-
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
     password: str = Field(...)
@@ -45,7 +45,7 @@ class LoginInput(Model):
     password: str
 
 
-class JwtExtractedUser(Model):
+class User(Model):
     """Schema for user that which was set in jwt payload"""
 
     user_id: PydanticObjectId = Field(description="User id")
@@ -54,3 +54,15 @@ class JwtExtractedUser(Model):
 
 class CurrentUserOutput(Model):
     user_id: PydanticObjectId = Field(description="User id", alias="_id")
+
+
+class CompleteUserDatabaseOutput(Model):
+    profile: UserProfile = Field(...)
+    username: EmailStr = Field(...)
+    permissions: list = Field(...)
+    created_at: datetime = Field(...)
+    updated_at: datetime = Field(...)
+
+
+class CurrentUser(Model):
+    user_id: PydanticObjectId = Field(description="User", alias="_id")

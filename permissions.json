@@ -8,8 +8,10 @@
     "/api/authentication/register"
   ],
   "all_permissions": [
+    "read_admins",
     "read_users",
     "create_users",
+    "update_users",
     "read_books",
     "update_books",
     "delete_books"
@@ -22,6 +24,9 @@
       "POST": [
         "create_users"
       ]
+    },
+    "/user": {
+      "GET": [""]
     }
   }
 }
