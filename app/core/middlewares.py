@@ -16,7 +16,7 @@ async def auth_middleware(request: Request, call_next):
             content="Invalid authorization header",
             media_type="application/json",
         )
-
+    print(request.headers)
     payload: dict = await Jwt.decode(request.headers.get("Authorization"))
 
     user = await get_user_repository().get_user_by_id(payload.get("sub"))

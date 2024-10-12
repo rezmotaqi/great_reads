@@ -7,7 +7,7 @@ import bcrypt
 from bson import ObjectId
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import ExpiredSignatureError, JWTError, jwt  # Import exceptions
+from jose import ExpiredSignatureError, JWTError, jwt
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from passlib.context import CryptContext
 from starlette import status
@@ -17,18 +17,22 @@ from app.core.settings import settings
 from app.core.utils import SingletonMeta
 from app.handlers.databases import get_mongo_db
 from app.repositories.users import UserRepository, get_user_repository
-from app.schemas.users import (LoginInput, UserRegistrationInput,
-                               UserRegistrationOutput)
+from app.schemas.users import (
+	CompleteUserDatabaseOutput,
+	LoginInput,
+	UserRegistrationInput,
+	UserRegistrationOutput,
+)
 
 
 def hash_password(password: str) -> str:
 	"""Hashes a password subng bcrypt.
 
 	Args:
-		password (str): The password to hash.
+					password (str): The password to hash.
 
 	Returns:
-		str: The hashed password.
+					str: The hashed password.
 	"""
 
 	salt = bcrypt.gensalt()
@@ -67,13 +71,17 @@ class AuthService:
 	async def login_user(self, user_data: LoginInput):
 		user = await self.user_repository.get_user_by_email(user_data.email)
 		if not user or not check_password(user_data.password, user.password):
-			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-								detail="Unauthorized")
+			raise HTTPException(
+				status_code=status.HTTP_401_UNAUTHORIZED,
+				detail="Unauthorized"
+			)
 
-		access_token = Jwt.generate(user_id=user.id,
-									user_permissions=await
-									get_user_repository().get_permissions(
-										user_id=user.id))
+		access_token = Jwt.generate(
+			user_id=user.id,
+			user_permissions=await get_user_repository().get_permissions(
+				user_id=user.id
+			),
+		)
 		return access_token
 
 
@@ -94,14 +102,15 @@ async def get_current_user(
 		token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login")),
 		db: AsyncIOMotorDatabase = Depends(get_mongo_db),
 ):
-	payload = jwt.decode(
-		token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-	)
+	payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[
+		settings.ALGORITHM])
 	user_id: str = payload.get("sub")
+
 	if user_id is None:
 		raise credentials_exception
-	user = await UserRepository(db=db).get_user_by_id(
-		user_id=ObjectId(user_id)
+	user = CompleteUserDatabaseOutput.model_validate(
+		{**await UserRepository(db=db).get_user_by_id(
+			user_id=ObjectId(user_id))}
 	)
 	if not user:
 		raise credentials_exception
@@ -138,14 +147,13 @@ class Jwt:
 	def generate(user_id: ObjectId, user_permissions: list) -> str:
 		now = datetime.utcnow()
 		token_expire = now + timedelta(
-			minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-		)
+			minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 		jwt_payload = {
 			"sub": str(user_id),
 			"exp": token_expire,
 			"iat": now,
 			"jti": str(uuid.uuid4()),
-			"permissions": user_permissions
+			"permissions": user_permissions,
 		}
 		access_token = jwt.encode(
 			jwt_payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -169,14 +177,17 @@ class PermissionManager(metaclass=SingletonMeta):
 				self.permissions = json.loads(contents)
 		except FileNotFoundError as e:
 			print("Error: permissions.json not found.")
-			self.permissions = {"endpoints": {}, "all_permissions": [],
-								"public_endpoints": []}
+			self.permissions = {
+				"endpoints": {},
+				"all_permissions": [],
+				"public_endpoints": [],
+			}
 			await self.save_permissions()
+			raise e
 
 	async def get_endpoint_permissions(self, endpoint, method):
 		endpoint_permissions: dict = self.permissions["endpoints"].get(
-			endpoint
-		)
+			endpoint)
 		if endpoint_permissions:
 			return endpoint_permissions.get(method, [])
 		return []
@@ -222,7 +233,8 @@ class AdminRole(Role):
 	def __init__(self):
 		super().__init__(
 			permissions=["read_users", "create_users", "update_books",
-						 "delete_books"])
+						 "delete_books"]
+		)
 
 
 class ReaderRole(Role):

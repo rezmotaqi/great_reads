@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
 
-from app.core.authentication import (AuthService, get_authentication_service,
-                                     get_current_user)
-from app.schemas.users import UserRegistrationInput, UserRegistrationOutput
+from app.core.authentication import (
+    AuthService,
+    get_authentication_service,
+    get_current_user,
+)
+from app.schemas.users import CompleteUserDatabaseOutput, UserRegistrationInput
 
 router = APIRouter()
 
@@ -17,7 +19,10 @@ async def register(
 
 
 @router.get("/me")
-async def read_users_me():
+async def read_users_me(
+    # current_user: CompleteUserDatabaseOutput = Depends(get_current_user),
+):
+
     return
 
 
