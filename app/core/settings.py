@@ -9,9 +9,7 @@ class Settings(BaseSettings):
     )
 
     PROJECT_NAME: str = "Great reads"
-    PROJECT_DESCRIPTION: Optional[str] = (
-        "A site for managing the process of reading books."
-    )
+    PROJECT_DESCRIPTION: Optional[str] = "Exercising OOP and design patterns."
 
     ALGORITHM: str = "HS256"
 

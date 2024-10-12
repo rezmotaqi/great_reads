@@ -18,7 +18,9 @@ class PydanticObjectId(str):
                     core_schema.chain_schema(
                         [
                             core_schema.str_schema(),
-                            core_schema.no_info_plain_validator_function(cls.validate),
+                            core_schema.no_info_plain_validator_function(
+                                cls.validate
+                            ),
                         ]
                     ),
                 ]

@@ -19,7 +19,7 @@
   "endpoints": {
     "/book": {
       "GET": [
-        "read_users"
+        "read_books"
       ],
       "POST": [
         "create_users"
@@ -27,6 +27,9 @@
     },
     "/user": {
       "GET": [""]
+    },
+    "/authentication": {
+      "GET": []
     }
   }
 }

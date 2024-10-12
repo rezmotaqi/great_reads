@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Response, status
+from fastapi import HTTPException, status
 from starlette.requests import Request
 
 from app.core.authentication import Jwt, get_permission_manager
@@ -11,12 +11,11 @@ async def auth_middleware(request: Request, call_next):
         return await call_next(request)
 
     if request.headers.get("Authorization") is None:
-        return Response(
-            status_code=status.HTTP_403_FORBIDDEN,
-            content="Invalid authorization header",
-            media_type="application/json",
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
         )
-    print(request.headers)
     payload: dict = await Jwt.decode(request.headers.get("Authorization"))
 
     user = await get_user_repository().get_user_by_id(payload.get("sub"))

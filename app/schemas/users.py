@@ -40,11 +40,6 @@ class UserRegistrationOutput(Model):
     username: EmailStr = Field(...)
 
 
-class LoginInput(Model):
-    username: EmailStr
-    password: str
-
-
 class User(Model):
     """Schema for user that which was set in jwt payload"""
 

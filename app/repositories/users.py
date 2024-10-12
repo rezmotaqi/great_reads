@@ -1,11 +1,15 @@
+import logging
 from datetime import datetime
 
+import pymongo
 from bson import ObjectId
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from starlette import status
 
-from app.core.enums import UserStatuses
-from app.handlers.databases import get_mongo_db
+from app.core.authentication import generate_user_permissions
+from app.core.enums import UserStatus
+from app.core.utils import get_app_state_mongo_db
 from app.models.users import User
 from app.schemas.users import UserRegistrationInput
 
@@ -28,26 +32,40 @@ class UserRepository:
                 "password": hashed_password,
                 "created_at": now,
                 "updated_at": now,
+                "prs": await generate_user_permissions(),
             }
         )
-        await self.db.users.insert_one(user.model_dump())
+        try:
+            await self.db.users.insert_one(user.model_dump())
+        except pymongo.errors.DuplicateKeyError:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="User already exists",
+            )
+        except Exception as e:
+            logging.log(logging.CRITICAL, e)
+            raise e
 
-    async def get_user_by_email(self, email: str):
-        return await self.db.users.find_one({"username": email})
+    async def get_user_by_username(self, username: str):
+        return await self.db.users.find_one({"username": username})
 
     async def get_user_by_id(self, user_id: ObjectId):
+
         return await self.db.users.find_one({"_id": user_id})
 
     async def get_permissions(self, user_id: ObjectId) -> list:
+
         return await self.db.users.find_one(
             {
                 "_id": user_id,
-                "status": UserStatuses.ACTIVE,
+                "status": UserStatus.ACTIVE,
             }
         )
 
 
-def get_user_repository(
-    db: AsyncIOMotorDatabase = Depends(get_mongo_db),
+async def get_user_repository(
+    db: AsyncIOMotorDatabase = Depends(get_app_state_mongo_db),
 ) -> UserRepository:
+    a = UserRepository(db)
+    await a.get_permissions()
     return UserRepository(db=db)
