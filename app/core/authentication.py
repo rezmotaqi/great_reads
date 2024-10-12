@@ -17,10 +17,7 @@ from app.core.settings import settings
 from app.core.utils import SingletonMeta, get_app_state_mongo_db
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.authentication import LoginInput
-from app.schemas.users import (
-    CompleteUserDatabaseOutput,
-    UserRegistrationInput,
-)
+from app.schemas.users import CompleteUserDatabaseOutput, UserRegistrationInput
 
 
 def hash_password(password: str) -> str:
@@ -66,13 +63,11 @@ class AuthService:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
             )
-        access_token = (
-            Jwt.generate(
-                user_id=user.get("_id"),
-                user_permissions=get_user_repository().get_permissions(
-                    user_id=user.get("_id")
-                ),
-            ),
+        access_token = Jwt.generate(
+            user_id=user.get("_id"),
+            user_permissions=await (
+                await get_user_repository()
+            ).get_permissions(user_id=user.get("_id")),
         )
 
         return access_token
@@ -123,9 +118,13 @@ class Jwt:
     @staticmethod
     def decode(token: str):
         try:
+
             payload = jwt.decode(
-                token, settings.SECRET_KEY, algorithms=settings.ALGORITHM
+                "yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzBhNmJlNzQ3NDg0MzllMDJmYjVmMmUiLCJleHAiOjE3Mjg4MDE2MjUsImlhdCI6MTcyODc0MTYyNSwianRpIjoiYTY3MGIxNjctNDhhZi00ZWY4LWI1NjctY2QwMjVmOGU5MmYwIiwicHJzIjoiW1wicmVhZHNfYm9va3NcIl0ifQ.fxu6gcq06ikQlM2GmHq93eLFWqk-LKIoC9mo7TL3Xqk",
+                settings.SECRET_KEY,
+                algorithms=settings.ALGORITHM,
             )
+            print(payload)
             return payload
         except ExpiredSignatureError:
             raise HTTPException(
@@ -134,7 +133,11 @@ class Jwt:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         except JWTError:
-            pass
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     @staticmethod
     def generate(user_id: ObjectId, user_permissions: list) -> str:
@@ -149,11 +152,12 @@ class Jwt:
             "jti": str(uuid.uuid4()),
             "prs": user_permissions,
         }
-        access_token = jwt.encode(
+
+        encoded_jwt = jwt.encode(
             jwt_payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM
         )
-        print(access_token)
-        return access_token
+
+        return encoded_jwt
 
 
 class PermissionManager(metaclass=SingletonMeta):
@@ -214,32 +218,3 @@ async def get_permission_manager():
     permission_manager = PermissionManager()
     await permission_manager.initialize()
     return permission_manager
-
-
-class Role:
-    def __init__(self, permissions=None):
-        self.permissions = permissions or []
-
-    def has_permission(self, permission):
-        return permission in self.permissions
-
-
-class AdminRole(Role):
-    def __init__(self):
-        super().__init__(
-            permissions=[
-                "read_users",
-                "create_users",
-                "update_books",
-                "delete_books",
-            ]
-        )
-
-
-class ReaderRole(Role):
-    def __init__(self):
-        super().__init__(permissions=["read_books"])
-
-
-async def generate_user_permissions(role: Role = ReaderRole()):
-    return role.permissions

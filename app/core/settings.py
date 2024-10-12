@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     API_ROUTE_PREFIX: str = "/api"
     SECRET_KEY: str = "123"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1000
 
 
 settings = Settings()

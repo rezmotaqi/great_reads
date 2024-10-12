@@ -7,10 +7,9 @@ from fastapi import Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from starlette import status
 
-from app.core.authentication import generate_user_permissions
-from app.core.enums import UserStatus
 from app.core.utils import get_app_state_mongo_db
 from app.models.users import User
+from app.schemas.authentication import ReaderRole, Role
 from app.schemas.users import UserRegistrationInput
 
 
@@ -32,7 +31,7 @@ class UserRepository:
                 "password": hashed_password,
                 "created_at": now,
                 "updated_at": now,
-                "prs": await generate_user_permissions(),
+                "permissions": await self.generate_permissions(),
             }
         )
         try:
@@ -53,19 +52,25 @@ class UserRepository:
 
         return await self.db.users.find_one({"_id": user_id})
 
-    async def get_permissions(self, user_id: ObjectId) -> list:
-
-        return await self.db.users.find_one(
-            {
-                "_id": user_id,
-                "status": UserStatus.ACTIVE,
-            }
+    @staticmethod
+    async def get_permissions(user_id: ObjectId) -> list:
+        user = await get_app_state_mongo_db().users.find_one(
+            {"_id": ObjectId("670a5ecd19dc393be2aafa57")}, {"permissions": 1}
         )
+
+        return user.get("permissions", [])
+
+    @staticmethod
+    async def generate_permissions(role: Role = ReaderRole()) -> list:
+        return role.permissions
 
 
 async def get_user_repository(
     db: AsyncIOMotorDatabase = Depends(get_app_state_mongo_db),
 ) -> UserRepository:
     a = UserRepository(db)
-    await a.get_permissions()
-    return UserRepository(db=db)
+    print(
+        a.get_permissions(user_id=ObjectId("670a5ecd19dc393be2aafa57")),
+        "1" * 100,
+    )
+    return a

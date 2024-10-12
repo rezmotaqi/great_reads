@@ -7,14 +7,29 @@ class Permission(Model):
     pass
 
 
-class Role(Model):
-    name: str
+class Role:
+    def __init__(self, permissions=None):
+        self.permissions = permissions or []
+
+    def has_permission(self, permission):
+        return permission in self.permissions
 
 
-class BaseRole:
-    def __init__(self, role_name: str, role_description: str):
-        self.role_name = role_name
-        self.role_description = role_description
+class AdminRole(Role):
+    def __init__(self):
+        super().__init__(
+            permissions=[
+                "read_users",
+                "create_users",
+                "update_books",
+                "delete_books",
+            ]
+        )
+
+
+class ReaderRole(Role):
+    def __init__(self):
+        super().__init__(permissions=["read_books"])
 
 
 class LoginInput(Model):
