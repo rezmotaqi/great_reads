@@ -118,14 +118,16 @@ class Jwt:
 
     @staticmethod
     def decode(token: str):
+        token = token[len("Bearer") :].strip().rsplit(" ")
+
         try:
-            print(token)
+
+            # Extract the token part and strip any potential extra spaces
             payload = jwt.decode(
                 token,
                 settings.SECRET_KEY,
                 algorithms=settings.ALGORITHM,
             )
-            print(payload)
             return payload
         except ExpiredSignatureError:
             raise HTTPException(
@@ -133,12 +135,12 @@ class Jwt:
                 detail="Token has expired",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        except JWTError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            # except JWTError:
+            #     raise HTTPException(
+            #         status_code=status.HTTP_401_UNAUTHORIZED,
+            #         detail="Invalid token",
+            #         headers={"WWW-Authenticate": "Bearer"},
+            #     )
 
     @staticmethod
     def generate(user_id: ObjectId, user_permissions: list) -> str:
