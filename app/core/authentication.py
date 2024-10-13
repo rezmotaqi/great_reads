@@ -17,7 +17,7 @@ from app.core.settings import settings
 from app.core.utils import SingletonMeta, get_app_state_mongo_db
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.authentication import LoginInput
-from app.schemas.users import CompleteUserDatabaseOutput, UserRegistrationInput
+from app.schemas.users import CurrentUser, UserRegistrationInput
 
 
 def hash_password(password: str) -> str:
@@ -85,19 +85,20 @@ credentials_exception = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 async def get_current_user(
     db: AsyncIOMotorDatabase = Depends(get_app_state_mongo_db),
     token: str = Depends(oauth2_scheme),
-):
+) -> CurrentUser:
     payload = Jwt.decode(token)
     user_id: str = payload.get("sub")
 
     if user_id is None:
         raise credentials_exception
-    user = CompleteUserDatabaseOutput.model_validate(
+
+    user = CurrentUser.model_validate(
         {
             **await UserRepository(db=db).get_user_by_id(
                 user_id=ObjectId(user_id)
@@ -118,9 +119,9 @@ class Jwt:
     @staticmethod
     def decode(token: str):
         try:
-
+            print(token)
             payload = jwt.decode(
-                "yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzBhNmJlNzQ3NDg0MzllMDJmYjVmMmUiLCJleHAiOjE3Mjg4MDE2MjUsImlhdCI6MTcyODc0MTYyNSwianRpIjoiYTY3MGIxNjctNDhhZi00ZWY4LWI1NjctY2QwMjVmOGU5MmYwIiwicHJzIjoiW1wicmVhZHNfYm9va3NcIl0ifQ.fxu6gcq06ikQlM2GmHq93eLFWqk-LKIoC9mo7TL3Xqk",
+                token,
                 settings.SECRET_KEY,
                 algorithms=settings.ALGORITHM,
             )
@@ -153,10 +154,8 @@ class Jwt:
             "prs": user_permissions,
         }
 
-        encoded_jwt = jwt.encode(
-            jwt_payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-        )
-
+        encoded_jwt = jwt.encode(jwt_payload, "123", algorithm="HS256")
+        print(encoded_jwt)
         return encoded_jwt
 
 
@@ -184,6 +183,7 @@ class PermissionManager(metaclass=SingletonMeta):
             raise e
 
     async def get_endpoint_permissions(self, endpoint, method):
+
         endpoint_permissions: dict = self.permissions["endpoints"].get(
             endpoint
         )

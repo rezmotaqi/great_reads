@@ -16,6 +16,7 @@ class User(BaseModel):
     username: str
     password: str
     status: UserStatus = Field(default=UserStatus.ACTIVE)
+    permissions: list[str] = Field(default_factory=list[str])
 
     class Config:
         extra = "ignore"

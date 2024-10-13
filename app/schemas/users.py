@@ -55,9 +55,12 @@ class CompleteUserDatabaseOutput(Model):
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
     permissions: list = Field(...)
-    created_at: datetime = Field(...)
-    updated_at: datetime = Field(...)
 
 
 class CurrentUser(Model):
-    user_id: PydanticObjectId = Field(description="User", alias="_id")
+    user_id: PydanticObjectId = Field(
+        description="User id", validation_alias="_id"
+    )
+    profile: UserProfile = Field(...)
+    username: EmailStr = Field(...)
+    permissions: list = Field(...)

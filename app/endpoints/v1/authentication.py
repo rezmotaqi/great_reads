@@ -6,10 +6,7 @@ from app.core.authentication import (
     get_current_user,
 )
 from app.schemas.authentication import LoginInput
-from app.schemas.users import (
-    UserRegistrationInput,
-    CompleteUserDatabaseOutput,
-)
+from app.schemas.users import CurrentUser, UserRegistrationInput
 
 router = APIRouter()
 
@@ -22,12 +19,12 @@ async def register(
     return await auth_service.register_user(user)
 
 
-@router.get("/me")
-async def current(
-    current_user: CompleteUserDatabaseOutput = Depends(get_current_user),
-):
+@router.get("/me", response_model=CurrentUser)
+async def logged_in_user(
+    current_user: CurrentUser = Depends(get_current_user),
+) -> CurrentUser:
 
-    return
+    return current_user
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)

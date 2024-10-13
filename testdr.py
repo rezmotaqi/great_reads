@@ -1,13 +1,13 @@
-import base64
+from jose import jwt
 
-header = (
-    "yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"  # Replace with the actual header
+from app.core.settings import settings
+
+t = jwt.encode({"test": 1}, "123", algorithm="HS256")
+
+
+decoded_token = jwt.decode(
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzBhNWVjZDE5ZGMzOTNiZTJhYWZhNTciLCJleHAiOjE3Mjg4NDk1MTQsImlhdCI6MTcyODc4OTUxNCwianRpIjoiODg4MGIzZmQtNjIyYy00OTFjLWIzNmYtODBiNDk2N2JiZDkyIiwicHJzIjoiW1wicmVhZHNfYm9va3NcIl0ifQ.ougnyZ3GH4f0sqwwveX66wHDkNmFOyQZxHw5ygyJFpo",
+    "123",
+    algorithms=settings.ALGORITHM,
 )
-
-# Calculate the required padding
-missing_padding = len(header) % 4
-if missing_padding != 0:
-    header += "=" * (4 - missing_padding)
-
-decoded_header = base64.b64decode(header).decode("utf-8", errors="ignore")
-print(decoded_header)
+print(decoded_token)

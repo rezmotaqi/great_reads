@@ -5,7 +5,8 @@
     "/favicon.ico",
     "/",
     "/api/authentication/login",
-    "/api/authentication/register"
+    "/api/authentication/register",
+    "/api/users/me"
   ],
   "all_permissions": [
     "read_admins",
@@ -25,9 +26,7 @@
         "create_users"
       ]
     },
-    "/user": {
-      "GET": [""]
-    },
+
     "/authentication": {
       "GET": []
     }

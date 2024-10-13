@@ -23,6 +23,7 @@ class UserRepository:
         self,
         user_registration_input: UserRegistrationInput,
         hashed_password: str,
+        role: Role = ReaderRole(),
     ) -> None:
         now = datetime.utcnow()
         user = User.model_validate(
@@ -31,9 +32,10 @@ class UserRepository:
                 "password": hashed_password,
                 "created_at": now,
                 "updated_at": now,
-                "permissions": await self.generate_permissions(),
+                "permissions": await self.generate_permissions(role=role),
             }
         )
+        print(user.model_dump())
         try:
             await self.db.users.insert_one(user.model_dump())
         except pymongo.errors.DuplicateKeyError:
@@ -48,14 +50,17 @@ class UserRepository:
     async def get_user_by_username(self, username: str):
         return await self.db.users.find_one({"username": username})
 
-    async def get_user_by_id(self, user_id: ObjectId):
+    @staticmethod
+    async def get_user_by_id(user_id: ObjectId):
 
-        return await self.db.users.find_one({"_id": user_id})
+        return await get_app_state_mongo_db().users.find_one(
+            {"_id": ObjectId(user_id)}
+        )
 
     @staticmethod
     async def get_permissions(user_id: ObjectId) -> list:
         user = await get_app_state_mongo_db().users.find_one(
-            {"_id": ObjectId("670a5ecd19dc393be2aafa57")}, {"permissions": 1}
+            {"_id": user_id}, {"permissions": 1}
         )
 
         return user.get("permissions", [])
