@@ -23,7 +23,7 @@ async def auth_middleware(request: Request, call_next):
             content={"detail": "Not authenticated"},
         )
 
-    payload = Jwt.decode(token=token[len("Bearer ") :].strip())
+    payload = Jwt.decode(token=token[len("Bearer "):].strip())
 
     if permission_manager.is_superuser(payload.get("sub")):
         return await call_next(request)
