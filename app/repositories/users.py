@@ -8,7 +8,7 @@ from starlette import status
 
 from app.core.utils import mongo_db
 from app.models.users import User
-from app.schemas.authentication import ReaderRole, Role
+from app.schemas.authentication import NormalUser, Role
 from app.schemas.users import (
     CreateUserInput,
     UserRegistrationInput,
@@ -35,8 +35,8 @@ class UserRepository:
                 detail="User already exists",
             )
 
+    @staticmethod
     async def register_user(
-        self,
         user_registration_input: UserRegistrationInput,
         hashed_password: str,
     ) -> None:
@@ -47,7 +47,6 @@ class UserRepository:
                 "password": hashed_password,
                 "created_at": now,
                 "updated_at": now,
-                "permissions": await self.generate_permissions(),
             }
         )
         print(user.model_dump())
@@ -79,10 +78,6 @@ class UserRepository:
         )
 
         return user.get("permissions", [])
-
-    @staticmethod
-    async def generate_permissions(role: Role = ReaderRole()) -> list:
-        return role.permissions
 
 
 async def get_user_repository() -> UserRepository:

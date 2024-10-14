@@ -4,9 +4,7 @@ from pydantic import (
     EmailStr,
     Field,
     SecretStr,
-    model_validator,
 )
-from typing_extensions import Self
 
 from app.core.types import Model, PydanticObjectId
 from app.schemas.authentication import Role
@@ -60,7 +58,7 @@ class CreateUserInput(Model):
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
     permissions: Optional[list] = Field(...)
-    role: Optional[Role]
+    role: Optional[Role] = Field()
     password: SecretStr = Field(...)
     repeat_password: SecretStr = Field(...)
 

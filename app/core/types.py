@@ -1,7 +1,7 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from pydantic_core import core_schema
 
 
@@ -39,11 +39,8 @@ class PydanticObjectId(str):
 
 
 class Model(BaseModel):
-    class Config:
-        # datetime_format = "%Y-%m-%d %H:%M:%S"
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-        json_encoders = {
-            ObjectId: str  # You can define how to encode PydanticObjectId
-            # datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S")
-        }
+    json_encoders: ClassVar[dict] = {
+        ObjectId: str,  # Converts ObjectId to string during serialization
+    }

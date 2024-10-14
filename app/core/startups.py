@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
         password=settings.MONGO_PASSWORD,
     )
     db = client[settings.MONGO_DB]
-    app.state.mongo_db = db
+    app.state.mongo_db = db  # type: ignore
     await startup_jobs(db)
     yield
 
