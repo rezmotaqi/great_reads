@@ -14,7 +14,7 @@ from starlette import status
 from starlette.responses import Response
 
 from app.core.settings import settings
-from app.core.utils import SingletonMeta, get_app_state_mongo_db
+from app.core.utils import SingletonMeta, mongo_db
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.authentication import LoginInput
 from app.schemas.users import CurrentUser, UserRegistrationInput
@@ -89,7 +89,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 async def get_current_user(
-    db: AsyncIOMotorDatabase = Depends(get_app_state_mongo_db),
+    db: AsyncIOMotorDatabase = Depends(mongo_db),
     token: str = Depends(oauth2_scheme),
 ) -> CurrentUser:
     payload = Jwt.decode(token)
@@ -209,8 +209,11 @@ class PermissionManager(metaclass=SingletonMeta):
 
     @staticmethod
     async def is_superuser(user_id: ObjectId) -> bool:
-        return get_app_state_mongo_db().users.find_one(
-            {"_id": user_id}, {"is_superuser": True}.get("is_superuser", False)
+        return (
+            await mongo_db().users.find_one(
+                {"_id": user_id}, {"is_superuser": True}
+            )
+            # .get("is_superuser", False)
         )
 
 

@@ -25,10 +25,5 @@ class MongoHandler(metaclass=SingletonMeta):
         return client[settings.MONGO_DB]
 
 
-def get_mongo_db() -> AsyncIOMotorDatabase:
-    """A function that returns database object."""
-    return MongoHandler.get_database()
-
-
 class RedisHandler(metaclass=SingletonMeta):
     redis_client = redis.from_url(settings.REDIS_URL)

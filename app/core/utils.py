@@ -18,6 +18,6 @@ def return_app_instance():
     return app
 
 
-def get_app_state_mongo_db() -> AsyncIOMotorDatabase:
+def mongo_db() -> AsyncIOMotorDatabase:
     app = return_app_instance()
     return app.state.mongo_db

@@ -41,7 +41,7 @@ class PydanticObjectId(str):
 class Model(BaseModel):
     class Config:
         # datetime_format = "%Y-%m-%d %H:%M:%S"
-        # arbitrary_types_allowed = True
+        arbitrary_types_allowed = True
 
         json_encoders = {
             ObjectId: str  # You can define how to encode PydanticObjectId

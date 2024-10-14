@@ -4,10 +4,10 @@ from fastapi import FastAPI, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.core.settings import settings
-from app.core.utils import get_app_state_mongo_db
+from app.core.utils import mongo_db
 
 
-async def startup_jobs(db: Depends(get_app_state_mongo_db)) -> None:
+async def startup_jobs(db: Depends(mongo_db)) -> None:
     db.users.create_index(
         [("username", 1)],
         unique=True,

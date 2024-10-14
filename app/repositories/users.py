@@ -6,7 +6,7 @@ from bson import ObjectId
 from fastapi import HTTPException
 from starlette import status
 
-from app.core.utils import get_app_state_mongo_db
+from app.core.utils import mongo_db
 from app.models.users import User
 from app.schemas.authentication import ReaderRole, Role
 from app.schemas.users import (
@@ -27,7 +27,7 @@ class UserRepository:
             }
         )
         try:
-            get_app_state_mongo_db().users.insert_one(data.model_dump())
+            await mongo_db().users.insert_one(data.model_dump())
             return CreateUserOutput.model_validate(data.model_dump())
         except pymongo.errors.DuplicateKeyError:  # type: ignore
             raise HTTPException(
@@ -39,7 +39,6 @@ class UserRepository:
         self,
         user_registration_input: UserRegistrationInput,
         hashed_password: str,
-        role: Role = ReaderRole(),
     ) -> None:
         now = datetime.utcnow()
         user = User.model_validate(
@@ -48,12 +47,12 @@ class UserRepository:
                 "password": hashed_password,
                 "created_at": now,
                 "updated_at": now,
-                "permissions": await self.generate_permissions(role=role),
+                "permissions": await self.generate_permissions(),
             }
         )
         print(user.model_dump())
         try:
-            get_app_state_mongo_db().users.insert_one(user.model_dump())
+            await mongo_db().users.insert_one(user.model_dump())
         except pymongo.errors.DuplicateKeyError:  # type: ignore
 
             raise HTTPException(
@@ -66,18 +65,16 @@ class UserRepository:
 
     @staticmethod
     async def get_user_by_username(username: str):
-        return get_app_state_mongo_db().users.find_one({"username": username})
+        return await mongo_db().users.find_one({"username": username})
 
     @staticmethod
     async def get_user_by_id(user_id: ObjectId):
 
-        return get_app_state_mongo_db().users.find_one(
-            {"_id": ObjectId(user_id)}
-        )
+        return await mongo_db().users.find_one({"_id": ObjectId(user_id)})
 
     @staticmethod
     async def get_permissions(user_id: ObjectId) -> list:
-        user = get_app_state_mongo_db().users.find_one(
+        user = await mongo_db().users.find_one(
             {"_id": user_id}, {"permissions": 1}
         )
 
