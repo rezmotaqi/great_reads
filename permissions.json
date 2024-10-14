@@ -23,12 +23,17 @@
         "read_books"
       ],
       "POST": [
-        "create_users"
+        "create_books"
       ]
     },
 
-    "/authentication": {
-      "GET": []
+    "/users": {
+      "GET": [
+        "read_users"
+      ],
+      "POST": [
+        "create_users"
+      ]
     }
   }
 }

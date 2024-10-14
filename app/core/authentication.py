@@ -46,7 +46,7 @@ class AuthService:
         self, user_registration_input: UserRegistrationInput
     ) -> Response:
         hashed_password = pwd_context.hash(user_registration_input.password)
-        await self.user_repository.create_user(
+        await self.user_repository.register_user(
             user_registration_input, hashed_password=hashed_password
         )
 
@@ -99,11 +99,7 @@ async def get_current_user(
         raise credentials_exception
 
     user = CurrentUser.model_validate(
-        {
-            **await UserRepository(db=db).get_user_by_id(
-                user_id=ObjectId(user_id)
-            )
-        }
+        {**await UserRepository().get_user_by_id(user_id=ObjectId(user_id))}
     )
     if not user:
         raise credentials_exception
@@ -213,7 +209,7 @@ class PermissionManager(metaclass=SingletonMeta):
 
     @staticmethod
     async def is_superuser(user_id: ObjectId) -> bool:
-        return await get_app_state_mongo_db().users.find_one(
+        return get_app_state_mongo_db().users.find_one(
             {"_id": user_id}, {"is_superuser": True}.get("is_superuser", False)
         )
 

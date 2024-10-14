@@ -23,14 +23,10 @@ async def auth_middleware(request: Request, call_next):
             content={"detail": "Not authenticated"},
         )
 
-    payload = Jwt.decode(token=token[len("Bearer "):].strip())
+    payload = Jwt.decode(token=token[len("Bearer ") :].strip())
 
-    if permission_manager.is_superuser(payload.get("sub")):
+    if await permission_manager.is_superuser(payload.get("sub")):
         return await call_next(request)
-
-    # user = await UserRepository(get_app_state_mongo_db()).get_user_by_id(
-    #     user_id=ObjectId(payload.get("sub"))
-    # )
 
     required_permissions = await permission_manager.get_endpoint_permissions(
         request.url.path, request.method

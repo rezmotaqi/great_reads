@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import EmailStr, Field
+from pydantic import EmailStr, Field, SecretStr
 
 from app.core.types import Model, PydanticObjectId
 
@@ -60,6 +60,20 @@ class CurrentUser(Model):
     user_id: PydanticObjectId = Field(
         description="User id", validation_alias="_id"
     )
+    profile: UserProfile = Field(...)
+    username: EmailStr = Field(...)
+    permissions: list = Field(...)
+
+
+class CreateUserInput(Model):
+    profile: UserProfile = Field(...)
+    username: EmailStr = Field(...)
+    permissions: list = Field(...)
+    password: SecretStr = Field(...)
+    repeat_password: SecretStr = Field(...)
+
+
+class CreateUserOutput(Model):
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
     permissions: list = Field(...)
