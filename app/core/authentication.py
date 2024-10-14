@@ -118,11 +118,7 @@ class Jwt:
 
     @staticmethod
     def decode(token: str):
-        token = token[len("Bearer") :].strip().rsplit(" ")
-
         try:
-
-            # Extract the token part and strip any potential extra spaces
             payload = jwt.decode(
                 token,
                 settings.SECRET_KEY,
@@ -135,12 +131,12 @@ class Jwt:
                 detail="Token has expired",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-            # except JWTError:
-            #     raise HTTPException(
-            #         status_code=status.HTTP_401_UNAUTHORIZED,
-            #         detail="Invalid token",
-            #         headers={"WWW-Authenticate": "Bearer"},
-            #     )
+        except JWTError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     @staticmethod
     def generate(user_id: ObjectId, user_permissions: list) -> str:
@@ -214,6 +210,12 @@ class PermissionManager(metaclass=SingletonMeta):
 
     async def get_public_endpoints(self):
         return self.permissions["public_endpoints"]
+
+    @staticmethod
+    async def is_superuser(user_id: ObjectId) -> bool:
+        return await get_app_state_mongo_db().users.find_one(
+            {"_id": user_id}, {"is_superuser": True}.get("is_superuser", False)
+        )
 
 
 async def get_permission_manager():

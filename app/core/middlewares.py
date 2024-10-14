@@ -1,11 +1,8 @@
-from bson import ObjectId
 from fastapi import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from app.core.authentication import get_permission_manager, Jwt
-from app.core.utils import get_app_state_mongo_db
-from app.repositories.users import UserRepository
+from app.core.authentication import Jwt, get_permission_manager
 
 
 async def auth_middleware(request: Request, call_next):
@@ -13,6 +10,7 @@ async def auth_middleware(request: Request, call_next):
     if request.url.path in await permission_manager.get_public_endpoints():
         return await call_next(request)
     token = request.headers.get("Authorization")
+
     if token is None:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -25,19 +23,20 @@ async def auth_middleware(request: Request, call_next):
             content={"detail": "Not authenticated"},
         )
 
-    payload = Jwt.decode(request.headers.get("Authorization"))
+    payload = Jwt.decode(token=token[len("Bearer ") :].strip())
 
-    user = await UserRepository(get_app_state_mongo_db()).get_user_by_id(
-        user_id=ObjectId(payload.get("sub"))
-    )
+    if permission_manager.is_superuser(payload.get("sub")):
+        return await call_next(request)
+
+    # user = await UserRepository(get_app_state_mongo_db()).get_user_by_id(
+    #     user_id=ObjectId(payload.get("sub"))
+    # )
 
     required_permissions = await permission_manager.get_endpoint_permissions(
         request.url.path, request.method
     )
 
-    missing_permissions = set(required_permissions) - set(
-        user.get("permissions")
-    )
+    missing_permissions = set(required_permissions) - set(payload.get("prs"))
     if missing_permissions:
         response_text = (
             f"Insufficient permissions. Missing: "
@@ -47,7 +46,5 @@ async def auth_middleware(request: Request, call_next):
             status_code=status.HTTP_401_UNAUTHORIZED,
             content={"detail": response_text},
         )
-
-    request.state.user = user
 
     return await call_next(request)

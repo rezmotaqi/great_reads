@@ -73,9 +73,4 @@ class UserRepository:
 async def get_user_repository(
     db: AsyncIOMotorDatabase = Depends(get_app_state_mongo_db),
 ) -> UserRepository:
-    a = UserRepository(db)
-    print(
-        a.get_permissions(user_id=ObjectId("670a5ecd19dc393be2aafa57")),
-        "1" * 100,
-    )
-    return a
+    return UserRepository(db)

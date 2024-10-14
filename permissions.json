@@ -6,7 +6,7 @@
     "/",
     "/api/authentication/login",
     "/api/authentication/register",
-    "/api/users/me"
+    "/api/authentication/me"
   ],
   "all_permissions": [
     "read_admins",
