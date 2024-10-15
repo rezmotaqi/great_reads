@@ -56,11 +56,13 @@ class CurrentUser(Model):
 
 class CreateUserInput(Model):
     profile: UserProfile = Field(...)
+
     username: EmailStr = Field(...)
-    permissions: Optional[list] = Field(...)
-    role: Optional[Role] = Field()
-    password: SecretStr = Field(...)
     repeat_password: SecretStr = Field(...)
+    password: SecretStr = Field(...)
+
+    permissions: Optional[list] = None
+    role: Optional[Role]
 
     # @model_validator(mode="after")
     # def check_passwords_match(self) -> Self:
@@ -79,7 +81,6 @@ class CreateUserInput(Model):
 class CreateUserOutput(Model):
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
-    permissions: list = Field(...)
 
 
 class LoginInput(Model):

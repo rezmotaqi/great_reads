@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import HTTPException, status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -30,7 +31,7 @@ async def auth_middleware(request: Request, call_next):
         payload = Jwt.decode(token=token[len("Bearer ") :].strip())
 
         # Check if the user is a superuser
-        if await permission_manager.is_superuser(payload.get("sub")):
+        if await permission_manager.is_superuser(ObjectId(payload.get("sub"))):
             return await call_next(request)
 
         # Check the required permissions for the endpoint

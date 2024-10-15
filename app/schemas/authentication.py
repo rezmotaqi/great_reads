@@ -1,5 +1,3 @@
-from typing import Any
-
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
@@ -26,12 +24,15 @@ class Role:
         )
 
     @classmethod
-    def validate(cls, data: Any):
-        if not isinstance(data, str):
-            raise ValueError("Role must be a string.")
-        # Custom validation logic
-        permissions = data.split(",")  # Assume permissions are comma-separated
-        return cls(permissions=permissions)  # Return an instance of Role
+    def validate(cls, v) -> str:
+        try:
+            return str(v)
+        except Exception:
+            raise ValueError(f"Cannot validate {v}")
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
 
 class AdminUser(Role):

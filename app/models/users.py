@@ -19,5 +19,4 @@ class User(Model):
     username: str
     password: str
     status: UserStatus = Field(default=UserStatus.ACTIVE)
-    permissions: list[str] = Field(default_factory=list[str])
-    role: Role = Field(...)
+    permissions: Optional[list[str]] = None

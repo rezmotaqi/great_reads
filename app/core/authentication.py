@@ -184,7 +184,9 @@ class PermissionManager(metaclass=SingletonMeta):
             return endpoint_permissions.get(method, [])
         return []
 
-    async def edit_permissions(self, endpoint, method, new_permissions: list):
+    async def edit_permissions(
+        self, endpoint, method, new_permissions: list
+    ) -> None:
         valid_permissions = self.permissions["all_permissions"]
         for permission in new_permissions:
             if permission not in valid_permissions:
@@ -194,7 +196,7 @@ class PermissionManager(metaclass=SingletonMeta):
         self.permissions["endpoints"][endpoint][method] = new_permissions
         await self.save_permissions()
 
-    async def save_permissions(self):
+    async def save_permissions(self) -> None:
 
         try:
             async with aiofiles.open("permissions.json", "w") as f:
@@ -203,17 +205,15 @@ class PermissionManager(metaclass=SingletonMeta):
             print("Error: permissions.json not found.")
             raise e
 
-    async def get_public_endpoints(self):
+    async def get_public_endpoints(self) -> list:
         return self.permissions["public_endpoints"]
 
     @staticmethod
     async def is_superuser(user_id: ObjectId) -> bool:
-        return (
-            await mongo_db().users.find_one(
-                {"_id": user_id}, {"is_superuser": True}
-            )
-            # .get("is_superuser", False)
+        user = await mongo_db().users.find_one(
+            {"_id": user_id}, {"is_superuser": True}
         )
+        return user.get("is_superuser", False)
 
 
 async def get_permission_manager():

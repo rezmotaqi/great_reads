@@ -8,7 +8,6 @@ from starlette import status
 
 from app.core.utils import mongo_db
 from app.models.users import User
-from app.schemas.authentication import NormalUser, Role
 from app.schemas.users import (
     CreateUserInput,
     UserRegistrationInput,
@@ -26,8 +25,9 @@ class UserRepository:
                 "password": data.password.get_secret_value(),
             }
         )
+        a = data.model_dump()
         try:
-            await mongo_db().users.insert_one(data.model_dump())
+            await mongo_db().users.insert_one(a)
             return CreateUserOutput.model_validate(data.model_dump())
         except pymongo.errors.DuplicateKeyError:  # type: ignore
             raise HTTPException(
@@ -49,7 +49,6 @@ class UserRepository:
                 "updated_at": now,
             }
         )
-        print(user.model_dump())
         try:
             await mongo_db().users.insert_one(user.model_dump())
         except pymongo.errors.DuplicateKeyError:  # type: ignore
