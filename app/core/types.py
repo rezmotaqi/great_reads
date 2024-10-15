@@ -42,5 +42,5 @@ class Model(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     json_encoders: ClassVar[dict] = {
-        ObjectId: str,  # Converts ObjectId to string during serialization
+        ObjectId: str,  # Converts ObjectId to string during serialization,
     }

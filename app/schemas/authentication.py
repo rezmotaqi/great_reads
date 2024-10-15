@@ -11,11 +11,11 @@ class Role:
     def __init__(self, permissions=None):
         self.permissions = permissions or []
 
-    def __get_pydantic_core_schema__(
-        self, handler: Any
-    ) -> core_schema.CoreSchema:
-        # Return a simple schema without further recursion
-        return core_schema.general_plain_schema(type(self))
+    # def __get_pydantic_core_schema__(
+    #     self, handler: Any
+    # ) -> core_schema.CoreSchema:
+    #     # Return a simple schema without further recursion
+    #     return core_schema.general_plain_schema(type(self))
 
     def has_permission(self, permission):
         return permission in self.permissions
