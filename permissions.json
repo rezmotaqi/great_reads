@@ -26,7 +26,6 @@
         "create_books"
       ]
     },
-
     "/users": {
       "GET": [
         "read_users"

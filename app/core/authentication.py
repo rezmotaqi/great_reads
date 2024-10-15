@@ -215,6 +215,10 @@ class PermissionManager(metaclass=SingletonMeta):
         )
         return user.get("is_superuser", False)
 
+    async def get_permissions_for_role(self, role):
+        roles = self.permissions.get("roles", {})
+        return roles.get(role, [])
+
 
 async def get_permission_manager():
     permission_manager = PermissionManager()

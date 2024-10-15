@@ -1,5 +1,12 @@
+from enum import Enum
+
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
+
+
+class RoleTypes(str, Enum):
+    admin = "admin"
+    normal_user = "normal_user"
 
 
 class Role:
