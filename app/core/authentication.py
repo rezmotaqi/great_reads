@@ -134,31 +134,6 @@ class Jwt:
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-    # class Jwt:
-    #     @staticmethod
-    #     def decode(token: str):
-    #         try:
-    #             payload = jwt.decode(
-    #                 token,
-    #                 settings.SECRET_KEY,
-    #                 algorithms=settings.ALGORITHM,
-    #             )
-    #             return payload
-    #         except ExpiredSignatureError:
-    #             # Raise an HTTPException for expired token
-    #             raise HTTPException(
-    #                 status_code=status.HTTP_401_UNAUTHORIZED,
-    #                 detail="Token has expired",
-    #                 headers={"WWW-Authenticate": "Bearer"},
-    #             )
-    #         except JWTError:
-    #             # Raise an HTTPException for any other token errors
-    #             raise HTTPException(
-    #                 status_code=status.HTTP_401_UNAUTHORIZED,
-    #                 detail="Invalid token",
-    #                 headers={"WWW-Authenticate": "Bearer"},
-    #             )
-
     @staticmethod
     def generate(user_id: ObjectId, user_permissions: list) -> str:
         now = datetime.utcnow()
