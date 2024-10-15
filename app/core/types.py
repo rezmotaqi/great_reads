@@ -4,6 +4,8 @@ from bson import ObjectId
 from pydantic import BaseModel, ConfigDict
 from pydantic_core import core_schema
 
+from app.schemas.authentication import Role
+
 
 class PydanticObjectId(str):
     @classmethod
@@ -39,8 +41,11 @@ class PydanticObjectId(str):
 
 
 class Model(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True, json_encoders={Role: lambda v: None}
+    )  # Exclude Role
 
     json_encoders: ClassVar[dict] = {
         ObjectId: str,  # Converts ObjectId to string during serialization,
+        Role: lambda v: v.generate_permissions(),
     }

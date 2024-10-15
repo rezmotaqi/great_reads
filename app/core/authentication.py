@@ -16,8 +16,7 @@ from starlette.responses import Response
 from app.core.settings import settings
 from app.core.utils import SingletonMeta, mongo_db
 from app.repositories.users import UserRepository, get_user_repository
-from app.schemas.authentication import LoginInput
-from app.schemas.users import CurrentUser, UserRegistrationInput
+from app.schemas.users import CurrentUser, UserRegistrationInput, LoginInput
 
 
 def hash_password(password: str) -> str:

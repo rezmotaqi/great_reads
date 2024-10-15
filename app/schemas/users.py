@@ -80,3 +80,8 @@ class CreateUserOutput(Model):
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
     permissions: list = Field(...)
+
+
+class LoginInput(Model):
+    username: str
+    password: SecretStr

@@ -5,8 +5,7 @@ from app.core.authentication import (
     get_authentication_service,
     get_current_user,
 )
-from app.schemas.authentication import LoginInput
-from app.schemas.users import CurrentUser, UserRegistrationInput
+from app.schemas.users import CurrentUser, UserRegistrationInput, LoginInput
 
 router = APIRouter()
 
