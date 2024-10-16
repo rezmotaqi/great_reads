@@ -1,4 +1,6 @@
+from abc import ABC, abstractmethod
 from enum import Enum
+from typing import List
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
@@ -16,9 +18,6 @@ class Role:
 
     def has_permission(self, permission):
         return permission in self.permissions
-
-    def generate_permissions(self):
-        return self.permissions
 
     @classmethod
     def __get_pydantic_core_schema__(
@@ -42,19 +41,33 @@ class Role:
         yield cls.validate
 
 
-class AdminUser(Role):
-    def __init__(self):
-        super().__init__(
-            permissions=[
-                "read_users",
-                "create_users",
-                "update_books",
-                "delete_books",
-                "",
-            ]
-        )
+class PermissionStrategy(ABC):
+    @abstractmethod
+    def get_permissions(self) -> list[str]:
+        pass
 
 
-class NormalUser(Role):
-    def __init__(self):
-        super().__init__(permissions=["read_books"])
+class AdminPermissionStrategy(PermissionStrategy):
+    def get_permissions(self) -> list[str]:
+        return [
+            "read_users",
+            "create_users",
+            "update_books",
+            "delete_books",
+        ]
+
+
+class NormalUserPermissionStrategy(PermissionStrategy):
+    def get_permissions(self) -> list[str]:
+        return ["read_books"]
+
+
+class RoleFactory:
+    @staticmethod
+    def get_permission_strategy(role_type: str) -> PermissionStrategy:
+        if role_type == RoleTypes.admin.value:
+            return AdminPermissionStrategy()
+        elif role_type == RoleTypes.normal_user.value:
+            return NormalUserPermissionStrategy()
+        else:
+            raise ValueError(f"Unknown role type: {role_type}")
