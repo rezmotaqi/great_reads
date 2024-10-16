@@ -16,7 +16,7 @@ from starlette.responses import Response
 from app.core.settings import settings
 from app.core.utils import SingletonMeta, mongo_db
 from app.repositories.users import UserRepository, get_user_repository
-from app.schemas.users import CurrentUser, UserRegistrationInput, LoginInput
+from app.schemas.users import CurrentUser, LoginInput, UserRegistrationInput
 
 
 def hash_password(password: str) -> str:
@@ -67,6 +67,7 @@ class AuthService:
             user_permissions=await (
                 await get_user_repository()
             ).get_permissions(user_id=user.get("_id")),
+            is_superuser=user.get("is_superuser"),
         )
 
         return access_token
@@ -134,7 +135,10 @@ class Jwt:
             )
 
     @staticmethod
-    def generate(user_id: ObjectId, user_permissions: list) -> str:
+    def generate(
+        user_id: ObjectId, user_permissions: list, is_superuser: bool
+    ) -> str:
+
         now = datetime.utcnow()
         token_expire = now + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
@@ -145,10 +149,10 @@ class Jwt:
             "iat": now,
             "jti": str(uuid.uuid4()),
             "prs": user_permissions,
+            "isu": is_superuser,
         }
 
         encoded_jwt = jwt.encode(jwt_payload, "123", algorithm="HS256")
-        print(encoded_jwt)
         return encoded_jwt
 
 
@@ -207,13 +211,6 @@ class PermissionManager(metaclass=SingletonMeta):
 
     async def get_public_endpoints(self) -> list:
         return self.permissions["public_endpoints"]
-
-    @staticmethod
-    async def is_superuser(user_id: ObjectId) -> bool:
-        user = await mongo_db().users.find_one(
-            {"_id": user_id}, {"is_superuser": True}
-        )
-        return user.get("is_superuser", False)
 
     async def get_permissions_for_role(self, role):
         roles = self.permissions.get("roles", {})

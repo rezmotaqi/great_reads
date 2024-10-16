@@ -8,6 +8,7 @@ from starlette import status
 
 from app.core.utils import mongo_db
 from app.models.users import User
+from app.schemas.authentication import Role
 from app.schemas.users import (
     CreateUserInput,
     UserRegistrationInput,
@@ -18,16 +19,17 @@ from app.schemas.users import (
 class UserRepository:
     @staticmethod
     async def create_user(data: CreateUserInput) -> CreateUserOutput:
-        """This method is used by superuser to create a user."""
+        """This method is used by admin to create a user."""
         data = User.model_validate(
             {
                 **data.model_dump(mode="json"),
                 "password": data.password.get_secret_value(),
+                "updated_at": datetime.datetime.now(datetime.datetime.UTC),
+                "created_at": datetime.datetime.now(datetime.datetime.UTC),
             }
         )
-        a = data.model_dump()
         try:
-            await mongo_db().users.insert_one(a)
+            await mongo_db().users.insert_one(data.model_dump())
             return CreateUserOutput.model_validate(data.model_dump())
         except pymongo.errors.DuplicateKeyError:  # type: ignore
             raise HTTPException(
@@ -77,6 +79,18 @@ class UserRepository:
         )
 
         return user.get("permissions", [])
+
+    async def generate_user_permissions(self, role: Role) -> list:
+        # get role
+        # based on role return list of permissions
+        ...
+
+    @staticmethod
+    async def is_superuser(user_id: ObjectId) -> bool:
+        user = await mongo_db().users.find_one(
+            {"_id": user_id}, {"is_superuser": True}
+        )
+        return user.get("is_superuser", False)
 
 
 async def get_user_repository() -> UserRepository:

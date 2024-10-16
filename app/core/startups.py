@@ -2,17 +2,29 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import DuplicateKeyError
 
+from app.core.authentication import hash_password
 from app.core.settings import settings
 from app.core.utils import mongo_db
 
 
 async def startup_jobs(db: Depends(mongo_db)) -> None:
-    db.users.create_index(
+    await db.users.create_index(
         [("username", 1)],
         unique=True,
         background=True,
     )
+    try:
+        await db.users.insert_one(
+            {
+                "username": settings.SUPERUSER_USERNAME,
+                "password": hash_password(settings.SUPERUSER_PASSWORD),
+                "is_superuser": True,
+            }
+        )
+    except DuplicateKeyError:
+        print("Superuser already exists")
 
 
 @asynccontextmanager

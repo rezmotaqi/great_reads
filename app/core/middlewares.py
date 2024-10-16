@@ -31,7 +31,7 @@ async def auth_middleware(request: Request, call_next):
         payload = Jwt.decode(token=token[len("Bearer ") :].strip())
 
         # Check if the user is a superuser
-        if await permission_manager.is_superuser(ObjectId(payload.get("sub"))):
+        if payload.get("isu"):
             return await call_next(request)
 
         # Check the required permissions for the endpoint

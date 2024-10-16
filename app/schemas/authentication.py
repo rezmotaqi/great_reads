@@ -50,6 +50,7 @@ class AdminUser(Role):
                 "create_users",
                 "update_books",
                 "delete_books",
+                "",
             ]
         )
 
