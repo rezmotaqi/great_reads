@@ -8,13 +8,12 @@ from bson import ObjectId
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import ExpiredSignatureError, JWTError, jwt
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from passlib.context import CryptContext
 from starlette import status
 from starlette.responses import Response
 
 from app.core.settings import settings
-from app.core.utils import SingletonMeta, mongo_db
+from app.core.utils import SingletonMeta
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.users import CurrentUser, LoginInput, UserRegistrationInput
 
@@ -89,7 +88,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 async def get_current_user(
-    db: AsyncIOMotorDatabase = Depends(mongo_db),
     token: str = Depends(oauth2_scheme),
 ) -> CurrentUser:
     payload = Jwt.decode(token)

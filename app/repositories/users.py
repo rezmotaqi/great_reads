@@ -19,15 +19,15 @@ from app.schemas.users import (
 class UserRepository:
     @staticmethod
     async def create_user(data: CreateUserInput) -> CreateUserOutput:
-        """This method is used by admin to create a user."""
         data = User.model_validate(
             {
                 **data.model_dump(mode="json"),
                 "password": data.password.get_secret_value(),
-                "updated_at": datetime.datetime.now(datetime.datetime.UTC),
-                "created_at": datetime.datetime.now(datetime.datetime.UTC),
+                "updated_at": datetime.utcnow(),
+                "created_at": datetime.utcnow(),
             }
         )
+        """This method is used by admin to create a user."""
         try:
             await mongo_db().users.insert_one(data.model_dump())
             return CreateUserOutput.model_validate(data.model_dump())

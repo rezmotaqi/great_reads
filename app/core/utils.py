@@ -18,6 +18,7 @@ def return_app_instance():
     return app
 
 
+# noinspection PyUnresolvedReferences
 def mongo_db() -> AsyncIOMotorDatabase:
     app = return_app_instance()
     return app.state.mongo_db

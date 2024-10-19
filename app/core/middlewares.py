@@ -1,4 +1,3 @@
-from bson import ObjectId
 from fastapi import HTTPException, status
 from starlette.requests import Request
 from starlette.responses import JSONResponse

@@ -21,10 +21,12 @@ async def startup_jobs(db: Depends(mongo_db)) -> None:
                 "username": settings.SUPERUSER_USERNAME,
                 "password": hash_password(settings.SUPERUSER_PASSWORD),
                 "is_superuser": True,
+                "permissions": [],
             }
         )
+        print("Superuser inserted.")
     except DuplicateKeyError:
-        print("Superuser already exists")
+        pass
 
 
 @asynccontextmanager

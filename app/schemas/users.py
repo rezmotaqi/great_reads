@@ -1,10 +1,4 @@
-from typing import Optional
-
-from pydantic import (
-    EmailStr,
-    Field,
-    SecretStr,
-)
+from pydantic import EmailStr, Field, SecretStr
 
 from app.core.types import Model, PydanticObjectId
 from app.schemas.authentication import Role
@@ -13,7 +7,7 @@ from app.schemas.authentication import Role
 class UserProfile(Model):
     first_name: str = Field(...)
     last_name: str = Field(...)
-    avatar: Optional[str] = Field(...)
+    avatar: str | None = None
 
 
 class UserRegistrationInput(Model):
@@ -49,7 +43,7 @@ class CurrentUser(Model):
     user_id: PydanticObjectId = Field(
         description="User id", validation_alias="_id"
     )
-    profile: UserProfile = Field(...)
+    profile: UserProfile | None = None
     username: EmailStr = Field(...)
     permissions: list = Field(...)
 
@@ -61,8 +55,8 @@ class CreateUserInput(Model):
     repeat_password: SecretStr = Field(...)
     password: SecretStr = Field(...)
 
-    permissions: Optional[list] = None
-    role: Optional[Role]
+    permissions: list | None = None
+    role: Role | None
 
     # @model_validator(mode="after")
     # def check_passwords_match(self) -> Self:

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import List
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
@@ -11,6 +10,7 @@ class RoleTypes(str, Enum):
     normal_user = "normal_user"
 
 
+# noinspection PyUnusedLocal
 class Role:
 
     def __init__(self, permissions=None):
