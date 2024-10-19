@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime, timedelta
 
 import aiofiles
-import bcrypt
 from bson import ObjectId
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -17,22 +16,6 @@ from app.core.utils import SingletonMeta
 from app.repositories.users import UserRepository, get_user_repository
 from app.schemas.users import CurrentUser, LoginInput, UserRegistrationInput
 
-
-def hash_password(password: str) -> str:
-    """Hashes a password using bcrypt.
-
-    Args:
-      password (str): The password to hash.
-
-    Returns:
-      str: The hashed password.
-
-    """
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-    return hashed_password.decode("utf-8")
-
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -43,10 +26,7 @@ class AuthService:
     async def register_user(
         self, user_registration_input: UserRegistrationInput
     ) -> Response:
-        hashed_password = pwd_context.hash(user_registration_input.password)
-        await self.user_repository.register_user(
-            user_registration_input, hashed_password=hashed_password
-        )
+        await self.user_repository.register_user(user_registration_input)
 
         return Response(status_code=status.HTTP_201_CREATED)
 

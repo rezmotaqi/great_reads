@@ -5,15 +5,16 @@ from app.schemas.authentication import Role
 
 
 class UserProfile(Model):
-    first_name: str = Field(...)
-    last_name: str = Field(...)
+    first_name: str | None = None
+    last_name: str | None = None
     avatar: str | None = None
+    email: EmailStr | None = None
 
 
 class UserRegistrationInput(Model):
     profile: UserProfile = Field(...)
     username: EmailStr = Field(...)
-    password: str = Field(...)
+    password: SecretStr = Field(...)
     repeat_password: str = Field(...)
 
     # @field_validator("password")
@@ -44,19 +45,17 @@ class CurrentUser(Model):
         description="User id", validation_alias="_id"
     )
     profile: UserProfile | None = None
-    username: EmailStr = Field(...)
+    username: str = Field(...)
     permissions: list = Field(...)
 
 
 class CreateUserInput(Model):
     profile: UserProfile = Field(...)
-
     username: EmailStr = Field(...)
     repeat_password: SecretStr = Field(...)
     password: SecretStr = Field(...)
-
     permissions: list | None = None
-    role: Role | None
+    role: Role
 
     # @model_validator(mode="after")
     # def check_passwords_match(self) -> Self:

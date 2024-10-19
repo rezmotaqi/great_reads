@@ -1,14 +1,13 @@
 import logging
-from datetime import datetime
 
 import pymongo
 from bson import ObjectId
 from fastapi import HTTPException
+from pymongo.errors import DuplicateKeyError
 from starlette import status
 
 from app.core.utils import mongo_db
 from app.models.users import User
-from app.schemas.authentication import Role
 from app.schemas.users import (
     CreateUserInput,
     UserRegistrationInput,
@@ -19,16 +18,11 @@ from app.schemas.users import (
 class UserRepository:
     @staticmethod
     async def create_user(data: CreateUserInput) -> CreateUserOutput:
-        data = User.model_validate(
-            {
-                **data.model_dump(mode="json"),
-                "password": data.password.get_secret_value(),
-                "updated_at": datetime.utcnow(),
-                "created_at": datetime.utcnow(),
-            }
-        )
         """This method is used by admin to create a user."""
+
+        data = User.model_validate(data.model_dump(mode="json"))
         try:
+
             await mongo_db().users.insert_one(data.model_dump())
             return CreateUserOutput.model_validate(data.model_dump())
         except pymongo.errors.DuplicateKeyError:  # type: ignore
@@ -40,21 +34,13 @@ class UserRepository:
     @staticmethod
     async def register_user(
         user_registration_input: UserRegistrationInput,
-        hashed_password: str,
     ) -> None:
-        now = datetime.utcnow()
         user = User.model_validate(
-            {
-                **user_registration_input.model_dump(),
-                "password": hashed_password,
-                "created_at": now,
-                "updated_at": now,
-            }
+            user_registration_input.model_dump(),
         )
         try:
             await mongo_db().users.insert_one(user.model_dump())
-        except pymongo.errors.DuplicateKeyError:  # type: ignore
-
+        except DuplicateKeyError:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="User already exists",
@@ -79,11 +65,6 @@ class UserRepository:
         )
 
         return user.get("permissions", [])
-
-    async def generate_user_permissions(self, role: Role) -> list:
-        # get role
-        # based on role return list of permissions
-        ...
 
     @staticmethod
     async def is_superuser(user_id: ObjectId) -> bool:
