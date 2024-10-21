@@ -40,8 +40,7 @@ class User(Model):
     # noinspection PyTypeChecker
     @model_validator(mode="after")
     def populate_permissions(self, values: dict[str, str]) -> Self:
-        values["permissions"] = RoleFactory.get_permission_strategy(
-            values["role"]
+        self.permissions = RoleFactory.get_permission_strategy(
+            self.role
         ).get_permissions()
-
         return self
