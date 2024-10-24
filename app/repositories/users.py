@@ -8,11 +8,8 @@ from starlette import status
 
 from app.core.utils import mongo_db
 from app.models.users import User
-from app.schemas.users import (
-    CreateUserInput,
-    UserRegistrationInput,
-    CreateUserOutput,
-)
+from app.schemas.users import (CreateUserInput, CreateUserOutput,
+                               UserRegistrationInput)
 
 
 class UserRepository:
@@ -60,17 +57,13 @@ class UserRepository:
 
     @staticmethod
     async def get_permissions(user_id: ObjectId) -> list:
-        user = await mongo_db().users.find_one(
-            {"_id": user_id}, {"permissions": 1}
-        )
+        user = await mongo_db().users.find_one({"_id": user_id}, {"permissions": 1})
 
         return user.get("permissions", [])
 
     @staticmethod
     async def is_superuser(user_id: ObjectId) -> bool:
-        user = await mongo_db().users.find_one(
-            {"_id": user_id}, {"is_superuser": True}
-        )
+        user = await mongo_db().users.find_one({"_id": user_id}, {"is_superuser": True})
         return user.get("is_superuser", False)
 
 

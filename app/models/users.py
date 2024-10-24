@@ -16,7 +16,6 @@ class UserProfile(Model):
 
 
 class User(Model):
-
     profile: UserProfile | None = None
     username: str
     password: SecretStr
@@ -25,12 +24,8 @@ class User(Model):
         default_factory=list,
     )
     role: Role
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow
-    )
-    updated_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow
-    )
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    updated_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
 
     @field_validator("password")
     def hash_password(cls, password: SecretStr):

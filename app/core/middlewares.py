@@ -34,14 +34,10 @@ async def auth_middleware(request: Request, call_next):
             return await call_next(request)
 
         # Check the required permissions for the endpoint
-        required_permissions = (
-            await permission_manager.get_endpoint_permissions(
-                request.url.path, request.method
-            )
+        required_permissions = await permission_manager.get_endpoint_permissions(
+            request.url.path, request.method
         )
-        missing_permissions = set(required_permissions) - set(
-            payload.get("prs")
-        )
+        missing_permissions = set(required_permissions) - set(payload.get("prs"))
         if missing_permissions:
             response_text = (
                 f"Insufficient permissions. Missing: "

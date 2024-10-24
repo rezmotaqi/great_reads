@@ -8,6 +8,4 @@ class Book:
     async def save(data: BookCreateInput) -> BookCreateOutput:
         model = BookModel.model_validate(data.model_dump())
         result = await mongo_db().books.insert_one(model.model_dump())
-        return BookCreateOutput(
-            **model.model_dump(), book_id=result.inserted_id
-        )
+        return BookCreateOutput(**model.model_dump(), book_id=result.inserted_id)

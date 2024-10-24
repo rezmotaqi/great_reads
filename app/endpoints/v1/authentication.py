@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Depends, status
 
-from app.core.authentication import (
-    AuthService,
-    get_authentication_service,
-    get_current_user,
-)
-from app.schemas.users import CurrentUser, UserRegistrationInput, LoginInput
+from app.core.authentication import (AuthService, get_authentication_service,
+                                     get_current_user)
+from app.schemas.users import CurrentUser, LoginInput, UserRegistrationInput
 
 router = APIRouter()
 

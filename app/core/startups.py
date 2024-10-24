@@ -1,11 +1,11 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
 from app.core.settings import settings
-from app.core.utils import mongo_db, hash_password
+from app.core.utils import hash_password, mongo_db
 
 
 async def startup_jobs(db: Depends(mongo_db)) -> None:

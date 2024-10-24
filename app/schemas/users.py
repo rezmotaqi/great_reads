@@ -41,9 +41,7 @@ class CompleteUserDatabaseOutput(Model):
 
 
 class CurrentUser(Model):
-    user_id: PydanticObjectId = Field(
-        description="User id", validation_alias="_id"
-    )
+    user_id: PydanticObjectId = Field(description="User id", validation_alias="_id")
     profile: UserProfile | None = None
     username: str = Field(...)
     permissions: list = Field(...)

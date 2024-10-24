@@ -31,9 +31,7 @@ class AuthService:
         return Response(status_code=status.HTTP_201_CREATED)
 
     async def login_user(self, user_data: LoginInput):
-        user = await self.user_repository.get_user_by_username(
-            user_data.username
-        )
+        user = await self.user_repository.get_user_by_username(user_data.username)
 
         if not user or not check_password(
             user_data.password.get_secret_value(), user.get("password")
@@ -43,9 +41,9 @@ class AuthService:
             )
         access_token = Jwt.generate(
             user_id=user.get("_id"),
-            user_permissions=await (
-                await get_user_repository()
-            ).get_permissions(user_id=user.get("_id")),
+            user_permissions=await (await get_user_repository()).get_permissions(
+                user_id=user.get("_id")
+            ),
             is_superuser=user.get("is_superuser"),
         )
 
@@ -113,14 +111,10 @@ class Jwt:
             )
 
     @staticmethod
-    def generate(
-        user_id: ObjectId, user_permissions: list, is_superuser: bool
-    ) -> str:
+    def generate(user_id: ObjectId, user_permissions: list, is_superuser: bool) -> str:
 
         now = datetime.utcnow()
-        token_expire = now + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        token_expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         jwt_payload = {
             "sub": str(user_id),
             "exp": token_expire,
@@ -159,16 +153,12 @@ class PermissionManager(metaclass=SingletonMeta):
 
     async def get_endpoint_permissions(self, endpoint, method):
 
-        endpoint_permissions: dict = self.permissions["endpoints"].get(
-            endpoint
-        )
+        endpoint_permissions: dict = self.permissions["endpoints"].get(endpoint)
         if endpoint_permissions:
             return endpoint_permissions.get(method, [])
         return []
 
-    async def edit_permissions(
-        self, endpoint, method, new_permissions: list
-    ) -> None:
+    async def edit_permissions(self, endpoint, method, new_permissions: list) -> None:
         valid_permissions = self.permissions["all_permissions"]
         for permission in new_permissions:
             if permission not in valid_permissions:

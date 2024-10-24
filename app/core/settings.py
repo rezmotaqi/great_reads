@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     API_ROUTE_PREFIX: str = "/api"
     SECRET_KEY: str = "123"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1000
-    SUPERUSER_USERNAME: str
-    SUPERUSER_PASSWORD: str
+    SUPERUSER_USERNAME: str = "admin"
+    SUPERUSER_PASSWORD: str = "123"
 
 
 settings = Settings()
